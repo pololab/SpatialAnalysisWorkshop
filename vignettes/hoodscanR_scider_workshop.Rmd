@@ -27,7 +27,6 @@ output:
     df_print: paged
 nocite: | 
   @R-ggplot2, @R-knitr, @R-BiocWorkflowTools, @R-rmarkdown, @R-prettydoc
-bibliography: [packages.bib]
 vignette: >
   %\VignetteIndexEntry{hoodscanR & scider: Spatial downstream analysis workshop}
   %\VignetteEngine{knitr::rmarkdown}
