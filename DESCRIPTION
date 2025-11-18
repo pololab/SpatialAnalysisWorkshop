@@ -23,6 +23,7 @@ RoxygenNote: 7.3.2
 Depends:
     R (>= 4.3)
 Imports:
+    Biobase,
     SpatialExperiment,
     SingleCellExperiment,
     SummarizedExperiment,
@@ -34,7 +35,8 @@ Imports:
     edgeR,
     ggrepel,
     patchwork,
-    zellkonverter
+    zellkonverter,
+    prettydoc
 Suggests:
     BiocStyle,
     knitr,
