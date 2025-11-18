@@ -1,0 +1,697 @@
+---
+title: "hoodscanR & scider: Spatial downstream analysis workshop"
+author:
+  - name: Ning Liu
+    affiliation:
+      - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
+      - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
+    email: liu.n@wehi.edu.au
+  - name: Nora Liu
+    affiliation:
+      - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
+      - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
+    email: nora.liu@adelaide.edu.au
+  - name: Monika Mohenska
+    affiliation:
+      - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
+      - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
+    email: monika.mohenska@adelaide.edu.au
+date: "`r format(Sys.time(), '%b %Y')`"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    toc: yes
+    toc_depth: 2
+    number_sections: yes
+    fig_caption: yes
+    df_print: paged
+nocite: | 
+  @R-ggplot2, @R-knitr, @R-BiocWorkflowTools, @R-rmarkdown, @R-prettydoc
+bibliography: [packages.bib]
+vignette: >
+  %\VignetteIndexEntry{hoodscanR & scider: Spatial downstream analysis workshop}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+keywords: spatial transcriptomics, neighbourhood, density
+---
+
+<p>
+
+**R version**: `r R.version.string` <br /> **Bioconductor version**: `r BiocManager::version()` 
+
+</p>
+
+# Welcome
+
+This 90‑minute, hands‑on workshop introduces two complementary Bioconductor packages for spatial transcriptomics (ST):
+
+- **hoodscanR** — discover *local cell neighborhoods* and perform neighborhood‑based downstream analysis.  
+- **scider** — estimate *cell type–specific spatial densities*, identify cell-type-specific ROIs and contours, and run density‑driven analyses.
+
+We’ll start with **local** structure (hoodscanR), then **zoom out** to density (scider).
+
+> **Data**  
+> Use either: (a) a published Xenium example in the vignettes below, or (b) your own ST dataset (counts + coordinates).
+
+## Getting started
+
+```{r}
+#install.packages("BiocManager")
+
+# If needed:
+#BiocManager::install(c("hoodscanR", "scider", "tidyverse", 
+#                       "patchwork", "ggrepel", "Seurat", "edgeR",
+#                        "zellkonverter"))
+
+suppressPackageStartupMessages({
+  library(hoodscanR)
+  library(scider)
+  library(tidyverse)
+})
+```
+
+# Part A — Local neighborhoods with hoodscanR
+
+Below is an edited version of the **hoodscanR** quick start, adapted for a live workshop.
+
+```{=html}
+<style type="text/css">
+  body { font-size: 14pt; }
+</style>
+```
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, dpi = 96)
+```
+
+## Introduction
+
+**hoodscanR** is an R package for analysing *cellular neighborhoods* in single‑cell‑resolution ST data.  
+It is built on the `r BiocStyle::Biocpkg("SpatialExperiment")` infrastructure and produces per‑cell neighborhood annotations, co‑localisation statistics, and neighborhood‑based clustering.
+
+## Installation
+
+```{r}
+#| eval: false
+if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install("hoodscanR")
+
+# Development version
+# devtools::install_github("DavisLaboratory/hoodscanR")
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(SummarizedExperiment)
+  library(SingleCellExperiment)
+  library(SpatialExperiment)
+})
+library(hoodscanR)
+
+ws_colors <- c(
+  "#FFBE7D", "#8E3B5D", "#1B263B", "#778DA9", "#BB3E03",
+  "#D37295", "#0A9396", "#8CD17D", "#FFD700", "#90EE90",
+  "#9B2226", "#E15759", "#9467BD", "#F28E2B", "#2EFEF7",
+  "#EE9B00", "#CA6702", "#94D2BD", "#E9D8A6", "#005F73",
+  "#32CD32", "#C5B0D5", "#3B3B3B", "#000080", "#2F4F4F",
+  "#FF00FF", "#7BA05B", "#AFEEEE", "#FF9D9A", "#BAB0AC",
+  "#59A14F"
+)
+```
+
+## Data exploration
+
+In this workshop we use a breast‑cancer tissue section from *Janesick et al.* (2023, *Nature Communications*), which introduced the Xenium in‑situ platform. This FFPE human breast tumour (ER+/HER2+, Stage II‑B) was profiled with a targeted 313‑gene panel using rolling‑circle amplification and cyclic fluorescent probe imaging, providing sub‑cellular transcript localisation. This dataset is ideal for combining neighborhood‑level and density‑level spatial analyses.
+
+```{r}
+spe <- readRDS("../data/spe_S1_Rep1.RDS")
+```
+
+Let’s confirm the structure of the `SpatialExperiment` object and its key elements.
+
+```{r}
+spe          # dimensions, assays, and metadata
+assayNames(spe)
+head(colData(spe))
+table(colData(spe)$cell_type)
+head(spatialCoords(spe))
+```
+
+The `readHoodData` function can format the spatialExperiment input object 
+as desired for all other functions in the `hoodscanR` package.
+
+
+```{r}
+spe <- readHoodData(spe, anno_col = "cell_type")
+```
+
+We can have a look at the tissue and cell positions by using the function `plotTissue`.
+
+
+The `plotTissue` function is very flexible, it takes all parameters that can go
+into `geom_point()` or `aes()`. And the output is a ggplot object, therefore is
+easily customised.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe, color = cell_annotation, size = 0.1, alpha = 0.9) +
+  scale_color_manual(values = ws_colors) +
+  guides(color = guide_legend(override.aes = list(shape = 15, size = 5)))
+```
+
+## Neighborhood detection
+
+Identify the *k* nearest cells for each cell (reduced to `k = 50` for speed during the workshop):
+
+```{r}
+fnc <- findNearCells(spe, k = 50)
+lapply(fnc, function(x) x[1:10, 1:5])  # peek at annotation/distance matrices
+```
+
+Compute per‑cell neighborhood probabilities.
+The `scanHoods` function contains the core algorithm of hoodscanR, which is controlled
+by the hyperparameter `tau`.
+By default, `tau` is set to median(m**2)/5 as `m` is the distance matrix (this was tested in multiple datasets).
+Smaller `tau` value assign greater weights to nearby cells, while larger value consider more distant cells as contributors to the neighborhood.
+In extreme case, if one want to have equal weights of all k cells, set parameter `mode` to `smoothFadeout`, it will search for the desired `tau` automatically.
+
+```{r}
+pm <- scanHoods(fnc$distance)
+pm[1:10, 1:5]
+```
+
+And the the probablities add up to 1.
+
+```{r}
+rowSums(pm)[sample(1:nrow(pm),50)]
+```
+
+
+The probability matrix can then be aggregated by annotation (cell type in this case):
+
+```{r}
+hoods <- mergeByGroup(pm, fnc$cells)
+hoods[1:10, ]
+```
+
+## neighborhood composition and clustering
+
+We plot randomly plot 10 cells to see the output of neighborhood scanning 
+using `plotHoodMat`. In this plot, each value represent the probability of the each
+cell (each row) located in each cell type neighborhood. 
+
+```{r}
+plotHoodMat(hoods, n = 10, hm_height = 5)
+```
+
+Or to check the cells-of-interest with the parameter `targetCells`.
+
+```{r}
+plotHoodMat(hoods, targetCells = c("900", "100000"), hm_height = 1)
+```
+
+We can then attach neighborhood probabilities back to `spe` and compute summary metrics.
+
+We can use `calcMetrics` to calculate entropy and perplexity of the probability
+matrix so that we can have a summarisation of the neighborhood distribution 
+across the tissue slide, i.e. where neighborhood is more distinct and where is 
+more mixed.
+
+While both entropy and perplexity measure the mixture of neighborhood
+of each cell, perplexity can be more intuitive for the human mind as the value
+of it actually mean something. For example, perplexity of 1 means the cell is
+located in a very distinct neighborhood, perplexity of 2 means the cell is
+located in a mixed neighborhood, and the probability is about 50% to 50%.
+
+```{r}
+spe <- mergeHoodSpe(spe, hoods)
+spe <- calcMetrics(spe, pm_cols = colnames(hoods))  # entropy & perplexity
+```
+
+Map entropy/perplexity across the tissue:
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe, color = entropy, size = 0.1) +
+  scale_color_gradient(low = "darkslateblue", high = "gold")
+```
+
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe, color = perplexity, size = 0.1) +
+  scale_color_gradient(low = "darkslategray", high = "gold")
+```
+
+We can perform neighborhood colocalisation analysis using `plotColocal`.
+This function compute pearson correlation on the probability distribution of each cell.
+Here we can see in the test data, immune cells are more likely to co-localise, luminal progeniotr (LP) cells and Basal cells are more likely to colocalise. Cancer cells have overall negative correlation to other immune cells, indicating no immune infiltration on this sample.
+
+```{r}
+hood_colocal_p <- plotColocal(spe, pm_cols = colnames(hoods))
+```
+
+We can cluster the cells by their neighborhood probability distribution using `clustByHood`.
+
+
+```{r}
+set.seed(88)
+
+spe <- clustByHood(spe, pm_cols = colnames(hoods), k = 9)
+```
+
+We can see what are the neighborhood distributions look like in each cluster using `plotProbDist`.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 7
+plotProbDist(
+  spe, pm_cols = colnames(hoods), by_cluster = TRUE, plot_all = TRUE,
+  fill = hoods, show_clusters = as.character(seq(9)), outlier.size = 0.1
+) + 
+  scale_fill_manual(values = ws_colors) + 
+  theme(legend.position = "none")
+```
+
+We can plot the clusters on the tissue slide, agian using `plotTissue`.
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe, color = clusters, size = 0.1) +
+  scale_color_manual(values = ws_colors[10:20]) +
+  guides(color = guide_legend(override.aes = list(shape = 15, size = 5)))
+```
+
+We can then mannual annotated the cluster by the distribution of
+cell type neighborhoods.
+
+
+```{r}
+clust_anno <- data.frame(
+  clusters = as.character(seq(9)),
+  cluster_annotation = c(
+    "NearCancer","Cancer","ImmuneTME",
+    "Cancer","ImmuneInfiltration","ImmuneInfiltration",
+    "Cancer","TME","ImmuneTME"
+  )
+)
+
+spe$cluster_annotation <- as.data.frame(colData(spe)) %>%
+  #dplyr::select(-cluster_annotation) %>%
+  dplyr::left_join(clust_anno, by = "clusters") %>%
+  dplyr::pull(cluster_annotation)
+
+```
+
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe, color = cluster_annotation, size = 0.1, reverseY = FALSE) +
+  scale_color_manual(values = ws_colors[3:10]) +
+  guides(color = guide_legend(override.aes = list(shape = 15, size = 5)))
+```
+
+## Comparing expression across neighborhood contexts
+
+As an illustration, we want to look at if spatial neighborhoods play a role
+in cancer cells from "Near Cancer" and "ImmuneInfiltration" neighborhoods.
+
+We can first subset cells that are "Cancer" cell types and located in "NearCancer" and "ImmnueInfiltration" neighborhoods.
+
+```{r}
+spe_c_nc <- spe[, spe$cluster_annotation == "NearCancer" & spe$cell_annotation == "Cancer"]
+spe_c_nc$group <- "Cancer_NearCancerHoods"
+
+spe_c_ii <- spe[, spe$cluster_annotation == "ImmuneInfiltration" & spe$cell_annotation == "Cancer"]
+spe_c_ii$group <- "Cancer_ImmuneInfiltrationHoods"
+
+spe_subset <- cbind(spe_c_nc, spe_c_ii)
+```
+
+```{r}
+#| fig-width: 10
+#| fig-height: 6
+plotTissue(spe_subset, size = 0.1, color = group, reverseY = FALSE) +
+  scale_color_manual(values = c("tomato", "royalblue")) +
+  guides(color = guide_legend(override.aes = list(shape = 15, size = 5)))
+```
+We can then perform differential expression (DE) analysis comparing cancer cells from different neighborhoods.
+DE can be performed in single-cell style, i.e. using tools like `Seurat` or `Scran`.
+Here we demonstrate a quick one using the `FindMarkers` function from `Seurat`.
+
+When data available (data with replicates), we strongly recommend using pseudo-bulk strategy with DE pipeline such as `edgeR` or `limma-voom` to give a more robust statistical inference.
+
+```{r}
+library(Seurat)
+
+seu <- CreateSeuratObject(
+  counts = assay(spe_subset, "counts"),
+  meta.data = as.data.frame(colData(spe_subset))
+) %>% NormalizeData() %>% ScaleData()
+
+Idents(seu) <- "group"
+c.de <- FindMarkers(seu, ident.1 = "Cancer_NearCancerHoods",
+                         ident.2 = "Cancer_ImmuneInfiltrationHoods",
+                         verbose = FALSE)
+
+de_df <- c.de %>%
+  dplyr::mutate(score = avg_log2FC * -log10(p_val_adj + 8.00000e-324) * (pct.1 - pct.2)) %>%
+  dplyr::arrange(dplyr::desc(score))
+
+Seurat::DoHeatmap(seu, features = rownames(head(de_df, n = 30)), label = FALSE)
+```
+
+> **Try it yourself:** Re‑run the analysis with `k = 30` and `k = 80` when running `findNearCells`. How do entropy/perplexity or neighborhoods change?
+
+
+# Part B — Cell‑type density, ROI and contours identification with scider
+
+```{=html}
+<style type="text/css">
+  body { font-size: 12pt; }
+</style>
+```
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, dpi = 200)
+suppressWarnings(library(tidyverse))
+suppressMessages(library(scider))
+suppressMessages(library(SpatialExperiment))
+```
+
+**scider** models *global cell‑type density* within a tissue section using the `SpatialExperiment` class, and supports co‑localisation, ROI detection, and differential density analyses.
+
+## Installation
+
+```{r}
+#| eval: false
+if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install("scider")
+
+# Development version
+# devtools::install_github("ChenLaboratory/scider")
+```
+
+```{r}
+library(scider)
+```
+
+scider is a R package providing functions to model the global density of cells
+in a slide of spatial transcriptomics data. 
+Same as hoodscanR, all functions in the package are built based on the
+SpatialExperiment object, allowing integration into various
+ST-related packages from Bioconductor.
+After modelling density, the package allows for serveral
+downstream analysis, including colocalization analysis,
+boundary detection analysis and differential density analysis.
+
+## Load data
+
+Again, we will use the same Xenium Breast Cancer dataset.
+
+```{r}
+spe <- readRDS("../data/spe_S1_Rep1.RDS")
+```
+
+Similarly, in scider, we can use the function `plotSpatial` to
+visualise the cell position and color the cells by cell types. 
+
+```{r}
+plotSpatial(spe, group.by = "cell_type", pt.alpha = 0.8)
+```
+
+## Grid‑based analysis
+
+### Density calculation
+
+We can perform density calculation for each cell type using function `gridDensity`.
+The calculated density and grid information are saved in the metadata of the
+SpatialExperimnet object.
+
+```{r}
+spe <- gridDensity(spe, id = "cell_type")
+names(metadata(spe))
+metadata(spe)$grid_density
+```
+
+We can visualise the overall cell density of the whole tissue using function `plotDensity`.
+
+```{r}
+plotDensity(spe)
+```
+
+The parameter `probs` control the filtering when plotting.
+Since we didn't specify cell type of interest in `coi` parameter when running `gridDensity`.
+It will compute cell density of all cell types.
+In a tumor sample, usually cancer region would have higher cell density.
+
+```{r}
+plotDensity(spe, probs = 0)
+```
+
+We can also visualise the density of individual cell type, e.g., fibroblast cells or cancer cells.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+plotDensity(spe, coi = "Fibroblast") + plotDensity(spe, coi = "Cancer")
+```
+
+### Find Regions of Interest (ROIs)
+
+After obtaining grid-based density for each COI, we can then detect
+regions-of-interest (ROIs) based on density or select by user.
+
+To detect ROIs automatically, we can use the function `findROI`.
+
+The detected ROIs are saved in the metadata of the SpatialExperiment object.
+
+Here we identify ROIs based on the cancer cell density.
+
+```{r}
+spe <- findROI(spe, coi = "Cancer")
+metadata(spe)$cancer_roi
+```
+
+We can visualise the ROIs with function `plotROI`.
+
+```{r}
+plotROI(spe, roi = "Cancer")
+```
+
+Many parameters can be tuned in `findROI()`.
+The `method` control what algorithm to be used when defining ROIs
+(Greedy, Walktrap, Connected, HDbscan etc).
+The `probs` control the proportion of cells (based on density) that 
+go into the identification of ROIs.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+spe1 <- findROI(spe, coi = "Cancer", probs = 0.6)
+spe2 <- findROI(spe, coi = "Cancer", probs = 0.6, method = "connected")
+spe3 <- findROI(spe, coi = "Cancer", probs = 0.6, method = "walktrap")
+spe4 <- findROI(spe, coi = "Cancer", probs = 0.6, method = "hdbscan")
+
+(plotROI(spe1, roi = "Cancer") + ggtitle("Greedy")) + 
+  (plotROI(spe2, roi = "Cancer") + ggtitle("Connected")) +
+  (plotROI(spe3, roi = "Cancer") + ggtitle("Walktrap")) +
+  (plotROI(spe4, roi = "Cancer") + ggtitle("HDbscan"))
+```
+
+```{r}
+spe <- findROI(spe, coi = "Cancer", probs = 0.6)
+```
+
+
+### Testing relationships between cell types
+
+After defining ROIs, we can then test the relationship between any two
+cell types within each ROI or overall but account for ROI variation using
+a cubic spline or a linear fit. This can be done with function `corrDensity`.
+
+```{r}
+cor.res <- corDensity(spe, roi = "Cancer")
+```
+
+We can see the correlation between each pair of cell types in each ROI.
+
+```{r}
+cor.res$ROI
+```
+
+Or the correlation between each pair of cell types across the whole slide:
+
+```{r}
+cor.res$overall
+```
+
+We can then visualise the statistics between each pair of cell types using
+function `plotCorHeatmap` in the ROIs
+
+```{r}
+#| fig-width: 6
+#| fig-height: 12
+plotCorHeatmap(cor.res$ROI)
+```
+
+Or the correlation between cell type pairs across the whole slide:
+```{r}
+#| fig-width: 5
+#| fig-height: 5
+plotCorHeatmap(cor.res$overall)
+```
+
+We can look back at the co-localisation done by hoodscanR, since we were using 
+cell types as the annotation to calculate the neighborhood probability matrix,
+we can see that at whole slide level, both methods generate very similar results.
+
+```{r}
+hood_colocal_p
+```
+
+But in scider, we can focus on ROIs, we can also visualise a fitted 
+pairwise relationship and its heterogeneity across ROIs.
+
+We can see that in different cancer ROIs, the co-localisation status between 
+basal cells and luminal progenitor are different. For example, they are positively
+correlated in ROI1 and ROI4, but negatively correlated in ROI12 and ROI16.
+
+Spatial pattern might be vary depends on tissue context, using scider can offer
+a more precise approach by examining it in different ROI.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+plotDensCor(spe, celltype1 = "Basal", celltype2 = "LP", roi = "Cancer") + plotROI(spe, roi = "Cancer")
+```
+
+
+## Contour‑based analysis
+
+Based on the grid density, we can ask many biological question about the data.
+For example, we would like to know if a certain cell type that are located in
+high density of cancer cells are different to the same cell type from
+a different level of cancer region.
+
+
+### Cell annotation by contour level
+
+To address this question, we first need to divide cells into different
+levels of grid density. This can be done using a contour identification
+strategy with function `getContour`.
+
+```{r}
+spe <- getContour(spe, coi = "Cancer")
+```
+
+Different level of contour can be visualised with cells using `plotContour`.
+
+```{r}
+plotContour(spe, coi = "Cancer")
+```
+
+
+We can then annotate cells by their locations within each contour
+using function `allocateCells`.
+
+
+```{r}
+spe <- allocateCells(spe)
+```
+
+We can visualise the continous regions on the tissue based on cancer density.
+
+```{r}
+plotSpatial(spe, group.by = "cancer_contour", pt.alpha = 0.5)
+```
+
+Compare composition per level:
+
+```{r}
+plotCellCompo(spe, contour = "Cancer")
+plotCellCompo(spe, contour = "Cancer", self.included = FALSE)
+```
+
+## Pseudobulk
+
+To investigate if cell types from different cancer contour regions have different
+transcriptomics profiles, one way to do this is by using the `spe2PB` function
+to pseudobulk the data by contour and cell types.
+
+
+```{r}
+y <- spe2PB(spe, contour = "Cancer")
+
+y
+dim(y)
+```
+
+Now that the object become a DGEList object, we can then use package such as 
+`edgeR` to examine the data.
+
+We can see that in PCA space, the pseudobulk data are clustered by cell type,
+and within cell type, we can observe a trend of variance by contour level.
+
+```{r}
+#| fig-width: 9
+#| fig-height: 7
+y <- edgeR::calcNormFactors(y)
+pca.res <- prcomp(t(edgeR::cpm(y, log = TRUE)), rank. = 10)$x
+
+cbind(y$samples, pca.res) %>%
+  ggplot(aes(PC1, PC2, color = cell_type)) +
+  geom_point(size = 5) +
+  scale_color_manual(values = ws_colors) +
+  ggrepel::geom_text_repel(aes(label = contour.level)) +
+  theme_classic()
+```
+
+
+
+# Part C — Useful utilities for Python tools
+
+Many tools aimming to analyse ST data have built in Python, especially tools that 
+built based on deep-learning algorithms.
+In python, most ST data are handled using the `AnnData` infrastructure.
+Therefore, it's important to learn how to transfer SpatialExperiment object data
+into an `AnnData` object in Python. Which can then be used for many
+Python-based methods.
+
+In `AnnData` object, the spatial coordinates is usually store in the `obsm` slot,
+which is used to store all the dimension reduction results. So we need to first
+transfer the cell coordinates to the `reducedDims` slot of the object.
+
+Then we can output a `.h5ad` file from the SpatialExperiment object, which can 
+then read by `scanpy.read_h5ad` via the `scanpy` library in Python.
+
+
+```{r}
+spe <- readRDS("../data/spe_S1_Rep1.RDS")
+```
+
+
+```{r}
+reducedDims(spe) <- list(spatial = spatialCoords(spe))
+zellkonverter::writeH5AD(spe, file = "../output/spe.h5ad", compression = "gzip")
+```
+
+
+# Summary
+
+The downstream analysis of the spatial transcriptomics data depends on the biological questions being asked, `hoodscanR` and `scider` are designed to look at spatial transcriptomics data in different perspectives, therefore offering .
+
+
+# Packages used 
+
+This workflow depends on various packages from version `r BiocManager::version()` of the Bioconductor project, running on `r version$version.string` or higher. The complete list of the packages used for this workflow are shown below:
+
+```{r session_info}
+sessionInfo()
+```
+

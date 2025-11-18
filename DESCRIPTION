@@ -1,28 +1,39 @@
-Package: BuildABiocWorkshop
-Title: Bioconductor or R Workshop Template and Github Actions
+Package: SpatialAnalysisWorkshop
+Title: Spatial transcriptomics downstream analysis with hoodscanR and scider
 Version: 2.0.1
 Authors@R: 
-    person(given = "Sean",
-           family = "Davis",
+    c(
+      person(given = "Ning",
+           family = "Liu",
            role = c("aut", "cre"),
-           email = "seandavi@gmail.com",
-           comment = c(ORCID = "0000-0002-8991-6458"))
-Description: This package serves as a template for using github actions to 
-    prepare a Bioconductor Workshop package for use. In particular,
-    a pkgdown website and docker image are generated based on workflow 
-    settings. 
+           email = "ning.liu@adelaide.edu.au",
+           comment = c(ORCID = "0000-0002-9487-9305"))
+    )
+    
+Description: This workshop aim to introduce two Bioconductor packages,
+hoodscanR and scider, that specialised in performing different downstream
+analysis for spatial transcriptomics data. 
+Maintainer: Ning Liu <ning.liu@adelaide.edu.au>
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
 Depends: 
-    Biobase
+    Biobase,
+    hoodscanR,
+    scider,
+    tidyverse,
+    patchwork,
+    ggrepel,
+    Seurat,
+    edgeR,
+    zellkonverter
 Suggests: 
     knitr,
     rmarkdown,
     pkgdown
-URL: https://seandavi.github.io/BuildABiocWorkshop/
-BugReports: https://github.com/seandavi/BuildABiocWorkshop/issues/new/choose
+URL: https://pololab.github.io/SpatialAnalysisWorkshop/
+BugReports: https://github.com/pololab/SpatialAnalysisWorkshop/issues
 VignetteBuilder: knitr
-DockerImage: ghcr.io/seandavi/buildabiocworkshop:latest
+DockerImage: ghcr.io/ningbioinfo/SpatialAnalysisWorkshop:latest
