@@ -36,4 +36,4 @@ Suggests:
 URL: https://pololab.github.io/SpatialAnalysisWorkshop/
 BugReports: https://github.com/pololab/SpatialAnalysisWorkshop/issues
 VignetteBuilder: knitr
-DockerImage: ghcr.io/ningbioinfo/SpatialAnalysisWorkshop:latest
+DockerImage: ghcr.io/pololab/SpatialAnalysisWorkshop:latest
