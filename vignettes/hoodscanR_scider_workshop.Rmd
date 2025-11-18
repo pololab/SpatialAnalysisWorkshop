@@ -678,7 +678,7 @@ spe <- readRDS("../data/spe_S1_Rep1.RDS")
 
 ```{r}
 reducedDims(spe) <- list(spatial = spatialCoords(spe))
-zellkonverter::writeH5AD(spe, file = "../output/spe.h5ad", compression = "gzip")
+zellkonverter::writeH5AD(spe, file = "../data/spe.h5ad", compression = "gzip")
 ```
 
 
