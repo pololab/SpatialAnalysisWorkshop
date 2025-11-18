@@ -1,38 +1,45 @@
 Package: SpatialAnalysisWorkshop
 Title: Spatial transcriptomics downstream analysis with hoodscanR and scider
 Version: 2.0.1
-Authors@R: 
+Authors@R:
     c(
       person(given = "Ning",
-           family = "Liu",
-           role = c("aut", "cre"),
-           email = "ning.liu@adelaide.edu.au",
-           comment = c(ORCID = "0000-0002-9487-9305"))
+             family = "Liu",
+             role = c("aut", "cre"),
+             email = "ning.liu@adelaide.edu.au",
+             comment = c(ORCID = "0000-0002-9487-9305"))
     )
-    
-Description: This workshop aim to introduce two Bioconductor packages,
-hoodscanR and scider, that specialised in performing different downstream
-analysis for spatial transcriptomics data. 
+Description: This workshop aims to introduce two Bioconductor packages,
+ scider and hoodscanR, specialised for complementary downstream analyses on
+ spatial transcriptomics data. Participants will learn neighbourhood-level
+ analysis (probabilities, entropy/perplexity, clustering, and co-localisation)
+ with hoodscanR, and density modelling, ROI/contour detection, and
+ density-driven analyses with scider, using a Xenium breast cancer dataset.
 Maintainer: Ning Liu <ning.liu@adelaide.edu.au>
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
-Depends: 
-    Biobase,
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.3)
+Imports:
+    SpatialExperiment,
+    SingleCellExperiment,
+    SummarizedExperiment,
     hoodscanR,
     scider,
-    tidyverse,
-    patchwork,
-    ggrepel,
+    ggplot2,
+    dplyr,
     Seurat,
     edgeR,
+    ggrepel,
+    patchwork,
     zellkonverter
-Suggests: 
+Suggests:
+    BiocStyle,
     knitr,
-    rmarkdown,
-    pkgdown
+    rmarkdown
+biocViews: Workshop, SpatialTranscriptomics, SingleCell, Transcriptomics, Visualization
 URL: https://pololab.github.io/SpatialAnalysisWorkshop/
 BugReports: https://github.com/pololab/SpatialAnalysisWorkshop/issues
 VignetteBuilder: knitr
