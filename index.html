@@ -75,58 +75,98 @@
       </header><div class="row">
   <div class="contents col-md-9">
 <div class="section level1">
-<div class="page-header"><h1 id="buildabiocworkshop">BuildABiocWorkshop<a class="anchor" aria-label="anchor" href="#buildabiocworkshop"></a>
+<div class="page-header"><h1 id="bhoodscanr--scider-spatial-downstream-analysis-workshop">BhoodscanR &amp; scider: Spatial downstream analysis workshop<a class="anchor" aria-label="anchor" href="#bhoodscanr--scider-spatial-downstream-analysis-workshop"></a>
 </h1></div>
-<p>This package is a template for building a Bioconductor workshop. The package includes Github actions to:</p>
-<ol style="list-style-type: decimal">
-<li>Set up bioconductor/bioconductor_docker:devel on Github resources</li>
-<li>Install package dependencies for your package (based on the <code>DESCRIPTION</code> file)</li>
-<li>Run <code><a href="http://r-lib.github.io/rcmdcheck/reference/rcmdcheck.html" class="external-link">rcmdcheck::rcmdcheck</a></code>
-</li>
-<li>Build a pkgdown website and push it to github pages</li>
-<li>Build a docker image with the installed package and dependencies and deploy to <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#pulling-container-images" class="external-link">the Github Container Repository</a> at the name <code>ghcr.io/gihub_user/repo_name</code>, all lowercase.</li>
-</ol>
 <div class="section level2">
-<h2 id="responsibilities">Responsibilities<a class="anchor" aria-label="anchor" href="#responsibilities"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Package authors are primarily responsible for:</p>
-<ol style="list-style-type: decimal">
-<li>Creating a landing site of their choosing for their workshops (a website). This website should be listed in the <code>DESCRIPTION</code> file as the <code>URL</code>.</li>
-<li>Creating a docker image that will contain workshop materials and the installed packages necessary to run those materials. The name of the resulting docker image, including “tag” if desired, should be listed in a non-standard tag, <code>DockerImage:</code> in the <code>DESCRIPTION</code> file.</li>
-</ol>
-<p>Both of those tasks can be accomplished using the Github actions included in this template package. The vignette accompanying this package describes how to accomplish both of these tasks.</p>
+<p>This workshop will introduce two Bioconductor packages, hoodscanR and scider, for performing downstream analysis on spatial transcriptomics data to identify cell neighbourhoods and model density. We apply these packages to analyse a publicly available Xenium dataset to answer different biological questions</p>
+<p>The workshop will be organised into two broad sections: * Conducting neighborhood analysis using hoodscanR * Conducting density analysis using scider</p>
+<p>Detailed material can be found <a href="https://pololab.github.io/SpatialAnalysisWorkshop/">here</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a>
+<h2 id="pre-requisites">Pre-requisites<a class="anchor" aria-label="anchor" href="#pre-requisites"></a>
 </h2>
-<p>For detailed instructions, see the <code>How to build a workshop</code> article/vignette.</p>
+<p>The workshop is aimed at researchers who are interested in in-depth analysis of spatial transcriptomics data. Basic R knowledge is assumed - this is not an introduction to R course. If you are not familiar with the R statistical programming language it is strongly suggested that you work through an introductory R course before you attend this workshop.</p>
 </div>
 <div class="section level2">
-<h2 id="results-of-successful-deployment">Results of successful deployment<a class="anchor" aria-label="anchor" href="#results-of-successful-deployment"></a>
+<h2 id="r-packages-used">
+<em>R</em> packages used<a class="anchor" aria-label="anchor" href="#r-packages-used"></a>
 </h2>
+<p>The following key R packages will be used:</p>
 <ul>
-<li>A working docker image that contains the installed package and dependencies.</li>
-<li>An up-to-date <code>pkgdown</code> website at <a href="https://YOURUSERNAME.github.io/YOURREPOSITORYNAME/" class="external-link uri">https://YOURUSERNAME.github.io/YOURREPOSITORYNAME/</a>
-</li>
-<li>Docker image will be tagged with <code>latest</code>, <code>sha-XXXXXX</code> where <code>XXXXXX</code> is the hash of the current <code>master</code> commit, and <code>master</code>.</li>
+<li><code>hoodscanR</code></li>
+<li><code>scider</code></li>
+<li><code>Seurat</code></li>
+<li><code>edgeR</code></li>
+<li><code>tidyverse</code></li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="to-use-the-resulting-image">To use the resulting image:<a class="anchor" aria-label="anchor" href="#to-use-the-resulting-image"></a>
+<h2 id="time-outline">Time outline<a class="anchor" aria-label="anchor" href="#time-outline"></a>
 </h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-e</span> PASSWORD=<span class="op">&lt;</span>choose_a_password_for_rstudio<span class="op">&gt;</span> -p 8787:8787 YOURDOCKERIMAGENAME</span></code></pre></div>
-<p>Once running, navigate to <a href="http://localhost:8787/" class="external-link uri">http://localhost:8787/</a> and then login with <code>rstudio</code>:<code>yourchosenpassword</code>.</p>
-<p>To try with <strong>this</strong> repository docker image:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-e</span> PASSWORD=abc <span class="at">-p</span> 8787:8787 ghcr.io/bioconductor/buildabiocworkshop</span></code></pre></div>
-<p><em>NOTE</em>: Running docker that uses the password in plain text like above exposes the password to others in a multi-user system (like a shared workstation or compute node). In practice, consider using an environment variable instead of plain text to pass along passwords and other secrets in docker command lines.</p>
+<table class="table">
+<colgroup>
+<col width="91%">
+<col width="8%">
+</colgroup>
+<thead><tr>
+<th>Activity</th>
+<th>Time</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Introduction &amp; setup</td>
+<td>5-10m</td>
+</tr>
+<tr>
+<td>Part A. Local neighborhoods with hoodscanR</td>
+<td>35-40m</td>
+</tr>
+<tr>
+<td>Part B. Cell‑type density modelling with scider</td>
+<td>35-40m</td>
+</tr>
+<tr>
+<td>Part C. Useful utilities for Python tools</td>
+<td>5m</td>
+</tr>
+<tr>
+<td>Q &amp; A</td>
+<td>5m</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
-<h2 id="whatcha-get">Whatcha get<a class="anchor" aria-label="anchor" href="#whatcha-get"></a>
+<h2 id="workshop-goals-and-objectives">Workshop goals and objectives<a class="anchor" aria-label="anchor" href="#workshop-goals-and-objectives"></a>
 </h2>
+<div class="section level3">
+<h3 id="learning-goals">Learning goals<a class="anchor" aria-label="anchor" href="#learning-goals"></a>
+</h3>
 <ul>
-<li><a href="https://bioconductor.github.io/BuildABiocWorkshop" class="external-link uri">https://bioconductor.github.io/BuildABiocWorkshop</a></li>
-<li>A Docker image that you can run locally, in the cloud, or (usually) even as a singularity container on HPC systems.</li>
+<li>Learn how to use hoodscanR to perform neighborhood analysis with spatial transcriptomics data.</li>
+<li>Learn how to use scider to conduct density modelling with spatial transcriptomics data.</li>
 </ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="workshop-package-installation">Workshop package installation<a class="anchor" aria-label="anchor" href="#workshop-package-installation"></a>
+</h2>
+<div class="section level3">
+<h3 id="guide">Guide<a class="anchor" aria-label="anchor" href="#guide"></a>
+</h3>
+<p>This is necessary in order to reproduce the code shown in the workshop. The workshop is designed for R <code>4.5.1+</code> and Bioconductor <code>3.22+</code>, and it can be installed via GitHub with the following command.</p>
+<p>Bioconductor can be installed by the following codes if you haven’t installed:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="op">)</span></span></code></pre>
+<p>To install this workflow package:</p>
+<pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">'remotes'</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install workshop package</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"pololab/SpatialAnalysisWorkshop"</span>, build_vignettes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre>
+</div>
 </div>
 </div>
   </div>
