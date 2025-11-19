@@ -1,52 +1,74 @@
-# BuildABiocWorkshop
+# BhoodscanR & scider: Spatial downstream analysis workshop
 
-This package is a template for building a Bioconductor workshop. The package
-includes Github actions to:
+## Overview
 
-1. Set up bioconductor/bioconductor_docker:devel on Github resources
-2. Install package dependencies for your package (based on the `DESCRIPTION` file)
-3. Run `rcmdcheck::rcmdcheck`
-4. Build a pkgdown website and push it to github pages
-5. Build a docker image with the installed package and dependencies and deploy to [the Github Container Repository](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#pulling-container-images) at the name `ghcr.io/gihub_user/repo_name`, all lowercase. 
+This workshop will introduce two Bioconductor packages, hoodscanR and scider,
+for performing downstream analysis on spatial transcriptomics data to identify
+cell neighbourhoods and model density.
+We apply these packages to analyse a publicly available Xenium dataset to answer
+different biological questions
 
-## Responsibilities
+The workshop will be organised into two broad sections:
+* Conducting neighborhood analysis using hoodscanR
+* Conducting density analysis using scider
 
-Package authors are primarily responsible for:
+Detailed material can be found [here](https://pololab.github.io/SpatialAnalysisWorkshop/).
 
-1. Creating a landing site of their choosing for their workshops (a website). This website should be listed in the `DESCRIPTION` file as the `URL`.
-2. Creating a docker image that will contain workshop materials and the installed packages necessary to run those materials. The name of the resulting docker image, including "tag" if desired, should be listed in a non-standard tag, `DockerImage:` in the `DESCRIPTION` file. 
+## Pre-requisites 
 
-Both of those tasks can be accomplished using the Github actions included in this template package. The vignette accompanying this package describes how to accomplish both of these tasks.
+The workshop is aimed at researchers who are interested in in-depth analysis of spatial transcriptomics data. 
+Basic R knowledge is assumed - this is not an introduction to R course. 
+If you are not familiar with the R statistical programming language it is 
+strongly suggested that you work through an introductory R course before you attend this workshop.
 
-## Details
+## _R_ packages used
 
-For detailed instructions, see the `How to build a workshop` article/vignette.
+The following key R packages will be used: 
 
-## Results of successful deployment
+* `hoodscanR`
+* `scider`
+* `Seurat`
+* `edgeR`
+* `tidyverse`
 
-- A working docker image that contains the installed package and dependencies.
-- An up-to-date `pkgdown` website at https://YOURUSERNAME.github.io/YOURREPOSITORYNAME/
-- Docker image will be tagged with `latest`, `sha-XXXXXX` where `XXXXXX` is the hash of the current `master` commit, and `master`. 
+## Time outline
 
-## To use the resulting image:
+| Activity                                                        | Time |
+|-----------------------------------------------------------------|------|
+| Introduction & setup                                            |5-10m |
+| Part A. Local neighborhoods with hoodscanR                      |35-40m|
+| Part B. Cell‑type density modelling with scider                 |35-40m|
+| Part C. Useful utilities for Python tools                       | 5m   |
+| Q & A                                                           | 5m   |
 
-```sh
-docker run -e PASSWORD=<choose_a_password_for_rstudio> -p 8787:8787 YOURDOCKERIMAGENAME
+
+## Workshop goals and objectives
+
+### Learning goals
+
+ - Learn how to use hoodscanR to perform neighborhood analysis with spatial transcriptomics data.
+ - Learn how to use scider to conduct density modelling with spatial transcriptomics data.
+
+## Workshop package installation 
+
+### Guide
+
+This is necessary in order to reproduce the code shown in the workshop. 
+The workshop is designed for R `4.5.1+` and Bioconductor `3.22+`, and it can be installed via GitHub with the following command.
+
+Bioconductor can be installed by the following codes if you haven't installed:
+
 ```
-Once running, navigate to http://localhost:8787/ and then login with `rstudio`:`yourchosenpassword`. 
+install.packages("BiocManager")
 
-To try with **this** repository docker image:
-
-```sh
-docker run -e PASSWORD=abc -p 8787:8787 ghcr.io/bioconductor/buildabiocworkshop
+BiocManager::install()
 ```
 
-*NOTE*: Running docker that uses the password in plain text like above exposes the password to others 
-in a multi-user system (like a shared workstation or compute node). In practice, consider using an environment 
-variable instead of plain text to pass along passwords and other secrets in docker command lines. 
+To install this workflow package:
 
+```
+install.packages('remotes')
 
-## Whatcha get
-
-- https://bioconductor.github.io/BuildABiocWorkshop
-- A Docker image that you can run locally, in the cloud, or (usually) even as a singularity container on HPC systems. 
+# Install workshop package
+remotes::install_github("pololab/SpatialAnalysisWorkshop", build_vignettes = FALSE)
+```
