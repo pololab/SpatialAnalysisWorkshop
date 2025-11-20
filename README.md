@@ -1,4 +1,4 @@
-# BhoodscanR & scider: Spatial downstream analysis workshop
+# hoodscanR & scider: Spatial downstream analysis workshop
 
 ## Overview
 

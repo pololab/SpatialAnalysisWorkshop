@@ -16,6 +16,12 @@ author:
       - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
       - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
     email: monika.mohenska@adelaide.edu.au
+  - name: Jose Polo
+    affiliation:
+      - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
+      - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
+      - Australian Regenerative Medicine Institute and Systems Biology Institute Australia, Monash University, Clayton, VIC 3800, Australia
+    email: jose.polo@adelaide.edu.au
 date: "`r format(Sys.time(), '%b %Y')`"
 output:
   prettydoc::html_pretty:
