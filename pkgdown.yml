@@ -3,7 +3,7 @@ pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   hoodscanR_scider_workshop: hoodscanR_scider_workshop.html
-last_built: 2025-11-19T03:26Z
+last_built: 2025-11-20T04:21Z
 urls:
   reference: https://pololab.github.io/SpatialAnalysisWorkshop/reference
   article: https://pololab.github.io/SpatialAnalysisWorkshop/articles
