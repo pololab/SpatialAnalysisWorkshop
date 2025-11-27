@@ -5,7 +5,7 @@ author:
     affiliation:
       - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
       - Adelaide Centre of Epigenetics, School of Biomedicine, University of Adelaide, Adelaide, SA 5000, Australia
-    email: liu.n@wehi.edu.au
+    email: ning.liu@adelaide.edu.au
   - name: Nora Liu
     affiliation:
       - SAiGENCI, University of Adelaide, Adelaide, SA 5000, Australia
