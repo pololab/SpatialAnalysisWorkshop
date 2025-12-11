@@ -110,7 +110,7 @@ Monash University, Clayton, VIC 3800,
 Australia<br><a class="author_email" href="mailto:#"></a><a href="mailto:jose.polo@adelaide.edu.au" class="email">jose.polo@adelaide.edu.au</a>
       </address>
                   
-            <h4 data-toc-skip class="date">Nov 2025</h4>
+            <h4 data-toc-skip class="date">Dec 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/pololab/SpatialAnalysisWorkshop/blob/devel/vignettes/hoodscanR_scider_workshop.Rmd" class="external-link"><code>vignettes/hoodscanR_scider_workshop.Rmd</code></a></small>
       <div class="hidden name"><code>hoodscanR_scider_workshop.Rmd</code></div>
@@ -122,7 +122,7 @@ Australia<br><a class="author_email" href="mailto:#"></a><a href="mailto:jose.po
 <p>
 </p>
 <p><strong>R version</strong>: R Under development (unstable)
-(2025-11-22 r89050) <br><strong>Bioconductor version</strong>:
+(2025-12-07 r89119) <br><strong>Bioconductor version</strong>:
 3.23</p>
 
 <div class="section level2">
@@ -155,7 +155,7 @@ Use either: (a) a published Xenium example in the vignettes below, or
 <code class="sourceCode R"><span><span class="co">#install.packages("BiocManager")</span></span>
 <span></span>
 <span><span class="co"># If needed:</span></span>
-<span><span class="co">#BiocManager::install(c("hoodscanR", "scider", "tidyverse", </span></span>
+<span><span class="co"># BiocManager::install(c("hoodscanR", "scider", "tidyverse", </span></span>
 <span><span class="co">#                       "patchwork", "ggrepel", "Seurat", "edgeR",</span></span>
 <span><span class="co">#                        "zellkonverter"))</span></span>
 <span></span>
@@ -189,8 +189,8 @@ co‑localisation statistics, and neighborhood‑based clustering.</p>
 <h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.github.io/BiocManager/" class="external-link">"BiocManager"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"hoodscanR"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")</span></span>
+<span><span class="co"># BiocManager::install("hoodscanR")</span></span>
 <span></span>
 <span><span class="co"># Development version</span></span>
 <span><span class="co"># devtools::install_github("DavisLaboratory/hoodscanR")</span></span></code></pre></div>
@@ -223,18 +223,18 @@ using rolling‑circle amplification and cyclic fluorescent probe imaging,
 providing sub‑cellular transcript localisation. This dataset is ideal
 for combining neighborhood‑level and density‑level spatial analyses.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1.RDS"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1_downsampled.RDS"</span><span class="op">)</span></span></code></pre></div>
 <p>Let’s confirm the structure of the <code>SpatialExperiment</code>
 object and its key elements.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span>          <span class="co"># dimensions, assays, and metadata</span></span></code></pre></div>
 <pre><code><span><span class="co">## class: SpatialExperiment </span></span>
-<span><span class="co">## dim: 313 162998 </span></span>
+<span><span class="co">## dim: 313 20000 </span></span>
 <span><span class="co">## metadata(0):</span></span>
 <span><span class="co">## assays(1): counts</span></span>
 <span><span class="co">## rownames(313): ABCC11 ACTA2 ... ZEB2 ZNF562</span></span>
 <span><span class="co">## rowData names(0):</span></span>
-<span><span class="co">## colnames(162998): 1 2 ... 167779 167780</span></span>
+<span><span class="co">## colnames(20000): 74255 120700 ... 138093 109402</span></span>
 <span><span class="co">## colData names(14): orig.ident nCount_RNA ... cell_type sample_id</span></span>
 <span><span class="co">## reducedDimNames(0):</span></span>
 <span><span class="co">## mainExpName: NULL</span></span>
@@ -247,46 +247,54 @@ object and its key elements.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 6 rows and 14 columns</span></span>
-<span><span class="co">##    orig.ident nCount_RNA nFeature_RNA transcript_counts control_probe_counts</span></span>
-<span><span class="co">##      &lt;factor&gt;  &lt;numeric&gt;    &lt;integer&gt;         &lt;integer&gt;            &lt;integer&gt;</span></span>
-<span><span class="co">## 1     S1_Rep1         28           15                28                    1</span></span>
-<span><span class="co">## 2     S1_Rep1         94           38                94                    0</span></span>
-<span><span class="co">## 5     S1_Rep1         48           33                48                    0</span></span>
-<span><span class="co">## 8     S1_Rep1         39           25                39                    0</span></span>
-<span><span class="co">## 9     S1_Rep1         19           15                19                    0</span></span>
-<span><span class="co">## 10    S1_Rep1         79           45                79                    0</span></span>
-<span><span class="co">##    control_codeword_counts total_counts cell_area nucleus_area RNA_snn_res.0.3</span></span>
-<span><span class="co">##                  &lt;integer&gt;    &lt;integer&gt; &lt;numeric&gt;    &lt;numeric&gt;        &lt;factor&gt;</span></span>
-<span><span class="co">## 1                        0           29   58.3870      26.6422               4</span></span>
-<span><span class="co">## 2                        0           94  197.0167      42.1308               4</span></span>
-<span><span class="co">## 5                        0           48  107.6525      37.4797               3</span></span>
-<span><span class="co">## 8                        0           39   85.0292      26.3712               4</span></span>
-<span><span class="co">## 9                        0           19   58.7934      11.0633               3</span></span>
-<span><span class="co">## 10                       0           79  106.1172      38.6086               3</span></span>
-<span><span class="co">##    seurat_clusters    ident   cell_type   sample_id</span></span>
-<span><span class="co">##           &lt;factor&gt; &lt;factor&gt; &lt;character&gt; &lt;character&gt;</span></span>
-<span><span class="co">## 1                4        4      Cancer     S1_Rep1</span></span>
-<span><span class="co">## 2                4        4      Cancer     S1_Rep1</span></span>
-<span><span class="co">## 5                3        3      Cancer     S1_Rep1</span></span>
-<span><span class="co">## 8                4        4      Cancer     S1_Rep1</span></span>
-<span><span class="co">## 9                3        3        Mast     S1_Rep1</span></span>
-<span><span class="co">## 10               3        3        Mast     S1_Rep1</span></span></code></pre>
+<span><span class="co">##        orig.ident nCount_RNA nFeature_RNA transcript_counts</span></span>
+<span><span class="co">##          &lt;factor&gt;  &lt;numeric&gt;    &lt;integer&gt;         &lt;integer&gt;</span></span>
+<span><span class="co">## 74255     S1_Rep1        112           53               112</span></span>
+<span><span class="co">## 120700    S1_Rep1         24           18                24</span></span>
+<span><span class="co">## 88401     S1_Rep1        188           83               188</span></span>
+<span><span class="co">## 49497     S1_Rep1        147           70               147</span></span>
+<span><span class="co">## 81648     S1_Rep1        114           67               114</span></span>
+<span><span class="co">## 116257    S1_Rep1        155           63               155</span></span>
+<span><span class="co">##        control_probe_counts control_codeword_counts total_counts cell_area</span></span>
+<span><span class="co">##                   &lt;integer&gt;               &lt;integer&gt;    &lt;integer&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">## 74255                     0                       0          112  231.5161</span></span>
+<span><span class="co">## 120700                    0                       0           24   25.0617</span></span>
+<span><span class="co">## 88401                     1                       0          189  269.4022</span></span>
+<span><span class="co">## 49497                     0                       0          147  122.8702</span></span>
+<span><span class="co">## 81648                     0                       0          114   80.3781</span></span>
+<span><span class="co">## 116257                    0                       0          155  559.8923</span></span>
+<span><span class="co">##        nucleus_area RNA_snn_res.0.3 seurat_clusters    ident   cell_type</span></span>
+<span><span class="co">##           &lt;numeric&gt;        &lt;factor&gt;        &lt;factor&gt; &lt;factor&gt; &lt;character&gt;</span></span>
+<span><span class="co">## 74255       41.9953              10              10       10           B</span></span>
+<span><span class="co">## 120700      14.6306              3               3        3            B</span></span>
+<span><span class="co">## 88401       30.9320              8               8        8            B</span></span>
+<span><span class="co">## 49497       40.2342              10              10       10           B</span></span>
+<span><span class="co">## 81648       33.1898              10              10       10           B</span></span>
+<span><span class="co">## 116257      29.9838              8               8        8            B</span></span>
+<span><span class="co">##          sample_id</span></span>
+<span><span class="co">##        &lt;character&gt;</span></span>
+<span><span class="co">## 74255      S1_Rep1</span></span>
+<span><span class="co">## 120700     S1_Rep1</span></span>
+<span><span class="co">## 88401      S1_Rep1</span></span>
+<span><span class="co">## 49497      S1_Rep1</span></span>
+<span><span class="co">## 81648      S1_Rep1</span></span>
+<span><span class="co">## 116257     S1_Rep1</span></span></code></pre>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">$</span><span class="va">cell_type</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">##           B       Basal      Cancer Endothelial  Fibroblast          LP </span></span>
-<span><span class="co">##        3549        7676       64264        8048       43628        3322 </span></span>
+<span><span class="co">##         470         965        7756        1010        5279         443 </span></span>
 <span><span class="co">##  Macrophage        Mast    Pericyte        T_NK </span></span>
-<span><span class="co">##       13111         508        2768       16124</span></span></code></pre>
+<span><span class="co">##        1617         105         376        1979</span></span></code></pre>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment-methods.html" class="external-link">spatialCoords</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    x_centroid y_centroid</span></span>
-<span><span class="co">## 1    847.2599   326.1914</span></span>
-<span><span class="co">## 2    826.3420   328.0318</span></span>
-<span><span class="co">## 5    841.3575   332.2425</span></span>
-<span><span class="co">## 8    828.7262   341.7123</span></span>
-<span><span class="co">## 9    847.6031   344.5115</span></span>
-<span><span class="co">## 10   838.7647   345.3068</span></span></code></pre>
+<pre><code><span><span class="co">##        x_centroid y_centroid</span></span>
+<span><span class="co">## 74255   2091.0556  2341.9031</span></span>
+<span><span class="co">## 120700  5747.7768   188.2580</span></span>
+<span><span class="co">## 88401   2897.7724   921.8289</span></span>
+<span><span class="co">## 49497    983.7776  1682.0426</span></span>
+<span><span class="co">## 81648   2196.9489  3474.3528</span></span>
+<span><span class="co">## 116257  4195.5660  2913.5248</span></span></code></pre>
 <p>The <code>readHoodData</code> function can format the
 spatialExperiment input object as desired for all other functions in the
 <code>hoodscanR</code> package.</p>
@@ -299,7 +307,7 @@ parameters that can go into <code><a href="https://ggplot2.tidyverse.org/referen
 <code><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes()</a></code>. And the output is a ggplot object, therefore is
 easily customised.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">cell_annotation</span>, size <span class="op">=</span> <span class="fl">0.1</span>, alpha <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">cell_annotation</span>, size <span class="op">=</span> <span class="fl">1</span>, alpha <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" width="960"></p>
@@ -313,30 +321,52 @@ easily customised.</p>
 <code class="sourceCode R"><span><span class="va">fnc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/findNearCells.html" class="external-link">findNearCells</a></span><span class="op">(</span><span class="va">spe</span>, k <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">fnc</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span>  <span class="co"># peek at annotation/distance matrices</span></span></code></pre></div>
 <pre><code><span><span class="co">## $cells</span></span>
-<span><span class="co">##    nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4 nearest_cell_5</span></span>
-<span><span class="co">## 1          Cancer         Cancer         Cancer         Cancer         Cancer</span></span>
-<span><span class="co">## 2          Cancer         Cancer         Cancer         Cancer         Cancer</span></span>
-<span><span class="co">## 5          Cancer         Cancer           Mast           Mast         Cancer</span></span>
-<span><span class="co">## 8          Cancer           Mast         Cancer         Cancer         Cancer</span></span>
-<span><span class="co">## 9          Cancer           Mast     Fibroblast    Endothelial         Cancer</span></span>
-<span><span class="co">## 10     Fibroblast           Mast         Cancer         Cancer     Fibroblast</span></span>
-<span><span class="co">## 11           Mast     Fibroblast         Cancer           Mast         Cancer</span></span>
-<span><span class="co">## 12         Cancer     Fibroblast         Cancer         Cancer           Mast</span></span>
-<span><span class="co">## 13     Fibroblast     Fibroblast         Cancer    Endothelial       Pericyte</span></span>
-<span><span class="co">## 14         Cancer         Cancer         Cancer         Cancer       Pericyte</span></span>
+<span><span class="co">##        nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4</span></span>
+<span><span class="co">## 74255      Fibroblast           T_NK           T_NK     Macrophage</span></span>
+<span><span class="co">## 120700           T_NK           T_NK           T_NK           T_NK</span></span>
+<span><span class="co">## 88401      Fibroblast         Cancer       Pericyte         Cancer</span></span>
+<span><span class="co">## 49497      Fibroblast         Cancer         Cancer         Cancer</span></span>
+<span><span class="co">## 81648            T_NK     Macrophage     Fibroblast     Fibroblast</span></span>
+<span><span class="co">## 116257     Macrophage     Fibroblast     Macrophage         Cancer</span></span>
+<span><span class="co">## 135391              B     Fibroblast           T_NK     Fibroblast</span></span>
+<span><span class="co">## 158544           Mast     Fibroblast     Fibroblast     Fibroblast</span></span>
+<span><span class="co">## 102914     Macrophage     Fibroblast           T_NK       Pericyte</span></span>
+<span><span class="co">## 163536     Fibroblast     Fibroblast     Fibroblast     Fibroblast</span></span>
+<span><span class="co">##        nearest_cell_5</span></span>
+<span><span class="co">## 74255     Endothelial</span></span>
+<span><span class="co">## 120700           T_NK</span></span>
+<span><span class="co">## 88401            T_NK</span></span>
+<span><span class="co">## 49497          Cancer</span></span>
+<span><span class="co">## 81648            T_NK</span></span>
+<span><span class="co">## 116257           T_NK</span></span>
+<span><span class="co">## 135391           T_NK</span></span>
+<span><span class="co">## 158544     Fibroblast</span></span>
+<span><span class="co">## 102914           T_NK</span></span>
+<span><span class="co">## 163536     Fibroblast</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $distance</span></span>
-<span><span class="co">##    nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4 nearest_cell_5</span></span>
-<span><span class="co">## 1        8.172200       8.453065      10.840976       14.55872       15.05543</span></span>
-<span><span class="co">## 2       12.315512      13.300914      13.818413       13.88673       15.36542</span></span>
-<span><span class="co">## 5        8.453065      12.999877      13.319093       13.76716       15.59475</span></span>
-<span><span class="co">## 8        9.978655      10.662621      10.845707       13.00335       13.88673</span></span>
-<span><span class="co">## 9        6.667777       8.874072      10.351267       11.39742       12.57170</span></span>
-<span><span class="co">## 10       5.942635       8.874072      10.662621       13.31909       13.44706</span></span>
-<span><span class="co">## 11       5.942635       8.118070       8.257451       10.35127       14.04276</span></span>
-<span><span class="co">## 12       6.015252       8.118070       9.556540       12.91560       13.44706</span></span>
-<span><span class="co">## 13       8.257451       9.556540       9.697260       10.52960       11.87510</span></span>
-<span><span class="co">## 14       7.912776       9.098504       9.697260       10.61688       12.16953</span></span></code></pre>
+<span><span class="co">##        nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4</span></span>
+<span><span class="co">## 74255        9.583545       32.99529       45.40122       47.88366</span></span>
+<span><span class="co">## 120700       6.958143       23.65510       28.53219       30.79678</span></span>
+<span><span class="co">## 88401       12.219895       31.90695       37.55933       43.91675</span></span>
+<span><span class="co">## 49497       20.698549       30.85904       47.98640       60.17125</span></span>
+<span><span class="co">## 81648       22.667176       22.93218       23.73071       24.09427</span></span>
+<span><span class="co">## 116257      35.390693       45.01257       45.02927       64.15289</span></span>
+<span><span class="co">## 135391      26.671208       32.78372       38.22396       40.21649</span></span>
+<span><span class="co">## 158544      37.271788       37.69992       39.42761       55.23958</span></span>
+<span><span class="co">## 102914      31.710921       31.84313       33.89131       34.96228</span></span>
+<span><span class="co">## 163536      19.170032       26.65044       50.63644       69.48550</span></span>
+<span><span class="co">##        nearest_cell_5</span></span>
+<span><span class="co">## 74255        49.77884</span></span>
+<span><span class="co">## 120700       32.26041</span></span>
+<span><span class="co">## 88401        50.63844</span></span>
+<span><span class="co">## 49497        65.72077</span></span>
+<span><span class="co">## 81648        25.14477</span></span>
+<span><span class="co">## 116257       65.29374</span></span>
+<span><span class="co">## 135391       42.47379</span></span>
+<span><span class="co">## 158544       58.49778</span></span>
+<span><span class="co">## 102914       36.36531</span></span>
+<span><span class="co">## 163536       85.83416</span></span></code></pre>
 <p>Compute per‑cell neighborhood probabilities. The
 <code>scanHoods</code> function contains the core algorithm of
 hoodscanR, which is controlled by the hyperparameter <code>tau</code>.
@@ -350,57 +380,68 @@ it will search for the desired <code>tau</code> automatically.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/scanHoods.html" class="external-link">scanHoods</a></span><span class="op">(</span><span class="va">fnc</span><span class="op">$</span><span class="va">distance</span><span class="op">)</span></span>
 <span><span class="va">pm</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##    nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4 nearest_cell_5</span></span>
-<span><span class="co">## 1      0.14532679     0.14264173     0.11866835     0.08138581     0.07674232</span></span>
-<span><span class="co">## 2      0.10755686     0.09724237     0.09194190     0.09124955     0.07677249</span></span>
-<span><span class="co">## 5      0.13967276     0.09460766     0.09148590     0.08715731     0.07034428</span></span>
-<span><span class="co">## 8      0.10902265     0.10304561     0.10143768     0.08259369     0.07511834</span></span>
-<span><span class="co">## 9      0.11092298     0.09672671     0.08635509     0.07885410     0.07047008</span></span>
-<span><span class="co">## 10     0.12661434     0.10645036     0.09258495     0.07178642     0.07081111</span></span>
-<span><span class="co">## 11     0.11446808     0.10130476     0.10038552     0.08591918     0.05996522</span></span>
-<span><span class="co">## 12     0.11527935     0.10237717     0.09249219     0.06841911     0.06469580</span></span>
-<span><span class="co">## 13     0.08913257     0.08126380     0.08038921     0.07516171     0.06663616</span></span>
-<span><span class="co">## 14     0.09164611     0.08455286     0.08083665     0.07502498     0.06513906</span></span></code></pre>
+<pre><code><span><span class="co">##        nearest_cell_1 nearest_cell_2 nearest_cell_3 nearest_cell_4</span></span>
+<span><span class="co">## 74255      0.24743309     0.15632692     0.09987663     0.08977103</span></span>
+<span><span class="co">## 120700     0.08228149     0.06501960     0.05782637     0.05435597</span></span>
+<span><span class="co">## 88401      0.20202190     0.13539572     0.11299346     0.08900804</span></span>
+<span><span class="co">## 49497      0.31377066     0.24649796     0.13232927     0.07211178</span></span>
+<span><span class="co">## 81648      0.05821776     0.05789459     0.05690935     0.05645536</span></span>
+<span><span class="co">## 116257     0.27763912     0.19440697     0.19427243     0.07425136</span></span>
+<span><span class="co">## 135391     0.11980032     0.10133376     0.08481507     0.07892335</span></span>
+<span><span class="co">## 158544     0.17449071     0.17192975     0.16169373     0.08114011</span></span>
+<span><span class="co">## 102914     0.08697412     0.08663813     0.08142812     0.07870863</span></span>
+<span><span class="co">## 163536     0.41005005     0.35016022     0.14907471     0.05253415</span></span>
+<span><span class="co">##        nearest_cell_5</span></span>
+<span><span class="co">## 74255      0.08243438</span></span>
+<span><span class="co">## 120700     0.05209352</span></span>
+<span><span class="co">## 88401      0.06641712</span></span>
+<span><span class="co">## 49497      0.05226846</span></span>
+<span><span class="co">## 81648      0.05512609</span></span>
+<span><span class="co">## 116257     0.06936819</span></span>
+<span><span class="co">## 135391     0.07242089</span></span>
+<span><span class="co">## 158544     0.06840683</span></span>
+<span><span class="co">## 102914     0.07516263</span></span>
+<span><span class="co">## 163536     0.01630978</span></span></code></pre>
 <p>And the the probablities add up to 1.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/MatrixGenerics/man/rowSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">pm</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">pm</span><span class="op">)</span>,<span class="fl">50</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##  56123  31793 154816  79154  22201 148644 139989 134153  80537  50037 114531 </span></span>
+<pre><code><span><span class="co">##  64273 122951  33068  40855  37751 119357 137891  34847   3685  74382  25775 </span></span>
 <span><span class="co">##      1      1      1      1      1      1      1      1      1      1      1 </span></span>
-<span><span class="co">## 150606  96404  63618 150038 112354 119591 135150  26717  21864 116163 159040 </span></span>
+<span><span class="co">##  36304   7828  78796  79565 157384  15543  57759 118926 152769 101434  23824 </span></span>
 <span><span class="co">##      1      1      1      1      1      1      1      1      1      1      1 </span></span>
-<span><span class="co">##  18817 157828  13350  36789  68861 104875  93298 107549  87075  81669   4014 </span></span>
+<span><span class="co">## 138336  14687 135529  82218  29269  94595  50009  80326  35063  61354  69081 </span></span>
 <span><span class="co">##      1      1      1      1      1      1      1      1      1      1      1 </span></span>
-<span><span class="co">##  56897  16668  31989 123240 150139 113037 112362  56203  59662  34015 120201 </span></span>
+<span><span class="co">## 143719  63742 137133   5897 108108  86337 155911  53863  62849  97458  61335 </span></span>
 <span><span class="co">##      1      1      1      1      1      1      1      1      1      1      1 </span></span>
-<span><span class="co">##  42802 105333  61666 152112 148579 112551 </span></span>
+<span><span class="co">## 164462  57137  31942  38357  63500 105802 </span></span>
 <span><span class="co">##      1      1      1      1      1      1</span></span></code></pre>
 <p>The probability matrix can then be aggregated by annotation (cell
 type in this case):</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hoods</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/mergeByGroup.html" class="external-link">mergeByGroup</a></span><span class="op">(</span><span class="va">pm</span>, <span class="va">fnc</span><span class="op">$</span><span class="va">cells</span><span class="op">)</span></span>
 <span><span class="va">hoods</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##              B        Basal    Cancer  Endothelial Fibroblast          LP</span></span>
-<span><span class="co">## 1  0.000000000 0.0003555214 0.8916551 0.0084971044 0.01426384 0.000000000</span></span>
-<span><span class="co">## 2  0.000000000 0.0000000000 0.9413406 0.0005825167 0.01467526 0.000000000</span></span>
-<span><span class="co">## 5  0.000000000 0.0000000000 0.7461033 0.0155281837 0.05451047 0.000000000</span></span>
-<span><span class="co">## 8  0.000000000 0.0000000000 0.7332068 0.0058283164 0.11235891 0.000000000</span></span>
-<span><span class="co">## 9  0.000000000 0.0045232799 0.6506000 0.0788541026 0.12237298 0.000000000</span></span>
-<span><span class="co">## 10 0.000000000 0.0002684542 0.6340705 0.0387094221 0.19742545 0.000000000</span></span>
-<span><span class="co">## 11 0.000000000 0.0010544488 0.6087430 0.0489706758 0.10130476 0.000000000</span></span>
-<span><span class="co">## 12 0.000000000 0.0011531594 0.7110618 0.0271487033 0.10237717 0.001070175</span></span>
-<span><span class="co">## 13 0.000000000 0.0066718571 0.5566046 0.0751617147 0.17039637 0.000000000</span></span>
-<span><span class="co">## 14 0.002023713 0.0189170354 0.7409844 0.0498423846 0.08392294 0.000000000</span></span>
-<span><span class="co">##      Macrophage       Mast     Pericyte         T_NK</span></span>
-<span><span class="co">## 1  0.0000000000 0.08269559 0.0025328670 0.0000000000</span></span>
-<span><span class="co">## 2  0.0000000000 0.04327177 0.0001298328 0.0000000000</span></span>
-<span><span class="co">## 5  0.0000000000 0.17864321 0.0052148088 0.0000000000</span></span>
-<span><span class="co">## 8  0.0042549586 0.14094027 0.0022257778 0.0011849299</span></span>
-<span><span class="co">## 9  0.0005434212 0.09672671 0.0460444905 0.0003350609</span></span>
-<span><span class="co">## 10 0.0030726069 0.10645036 0.0200031730 0.0000000000</span></span>
-<span><span class="co">## 11 0.0077116618 0.20038726 0.0318281687 0.0000000000</span></span>
-<span><span class="co">## 12 0.0332447296 0.10091124 0.0216986663 0.0013343449</span></span>
-<span><span class="co">## 13 0.0056733748 0.11885589 0.0666361551 0.0000000000</span></span>
-<span><span class="co">## 14 0.0063022186 0.03286823 0.0651390604 0.0000000000</span></span></code></pre>
+<pre><code><span><span class="co">##                   B       Basal       Cancer  Endothelial Fibroblast</span></span>
+<span><span class="co">## 74255  0.000000e+00 0.000000000 0.0000000000 8.243657e-02 0.45948075</span></span>
+<span><span class="co">## 120700 6.520852e-02 0.002271016 0.0000000000 0.000000e+00 0.02146852</span></span>
+<span><span class="co">## 88401  0.000000e+00 0.000000000 0.5136217518 6.601021e-04 0.20203062</span></span>
+<span><span class="co">## 49497  0.000000e+00 0.000000000 0.6352692624 5.657295e-05 0.31404660</span></span>
+<span><span class="co">## 81648  2.366055e-01 0.000000000 0.0000000000 4.875570e-03 0.21110334</span></span>
+<span><span class="co">## 116257 1.712587e-03 0.001866095 0.1864529116 2.086787e-06 0.23246693</span></span>
+<span><span class="co">## 135391 1.252779e-01 0.000000000 0.0000000000 1.024121e-03 0.42545186</span></span>
+<span><span class="co">## 158544 4.472992e-03 0.001061393 0.0004357638 2.319661e-02 0.77268124</span></span>
+<span><span class="co">## 102914 7.548474e-02 0.000000000 0.0012465501 6.352122e-04 0.27777566</span></span>
+<span><span class="co">## 163536 5.802003e-07 0.000000000 0.0028244743 9.152311e-05 0.99294550</span></span>
+<span><span class="co">##                  LP   Macrophage         Mast     Pericyte        T_NK</span></span>
+<span><span class="co">## 74255  0.000000e+00 1.468311e-01 0.0000000000 7.848602e-05 0.311173091</span></span>
+<span><span class="co">## 120700 0.000000e+00 4.078835e-02 0.0000000000 5.123326e-02 0.819030323</span></span>
+<span><span class="co">## 88401  0.000000e+00 1.310042e-02 0.0000000000 1.474055e-01 0.123181624</span></span>
+<span><span class="co">## 49497  0.000000e+00 1.263050e-02 0.0000000000 1.421058e-02 0.023786485</span></span>
+<span><span class="co">## 81648  0.000000e+00 1.000308e-01 0.0000000000 0.000000e+00 0.447384775</span></span>
+<span><span class="co">## 116257 1.070287e-06 5.071623e-01 0.0000000000 0.000000e+00 0.070335988</span></span>
+<span><span class="co">## 135391 0.000000e+00 5.588532e-02 0.0153970061 0.000000e+00 0.376963791</span></span>
+<span><span class="co">## 158544 0.000000e+00 6.544765e-04 0.1744907144 1.792423e-03 0.021214396</span></span>
+<span><span class="co">## 102914 0.000000e+00 1.615795e-01 0.0022524139 8.248192e-02 0.398543991</span></span>
+<span><span class="co">## 163536 0.000000e+00 3.104429e-07 0.0008273785 0.000000e+00 0.003310232</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="neighborhood-composition-and-clustering">neighborhood composition and clustering<a class="anchor" aria-label="anchor" href="#neighborhood-composition-and-clustering"></a>
@@ -415,8 +456,13 @@ cell type neighborhood.</p>
 <p>Or to check the cells-of-interest with the parameter
 <code>targetCells</code>.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotHoodMat.html" class="external-link">plotHoodMat</a></span><span class="op">(</span><span class="va">hoods</span>, targetCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"900"</span>, <span class="st">"100000"</span><span class="op">)</span>, hm_height <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotHoodMat.html" class="external-link">plotHoodMat</a></span><span class="op">(</span><span class="va">hoods</span>, targetCells <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"14114"</span>, <span class="st">"17216"</span><span class="op">)</span>, hm_height <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" width="700"></p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, targetcell <span class="op">=</span> <span class="st">"14114"</span>, targetsize <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>           color <span class="op">=</span> <span class="va">cell_annotation</span>, size <span class="op">=</span> <span class="fl">5</span>, alpha <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">)</span></span></code></pre></div>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" width="700"></p>
 <p>We can then attach neighborhood probabilities back to
 <code>spe</code> and compute summary metrics.</p>
 <p>We can use <code>calcMetrics</code> to calculate entropy and
@@ -429,18 +475,18 @@ value of it actually mean something. For example, perplexity of 1 means
 the cell is located in a very distinct neighborhood, perplexity of 2
 means the cell is located in a mixed neighborhood, and the probability
 is about 50% to 50%.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/mergeHoodSpe.html" class="external-link">mergeHoodSpe</a></span><span class="op">(</span><span class="va">spe</span>, <span class="va">hoods</span><span class="op">)</span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/calcMetrics.html" class="external-link">calcMetrics</a></span><span class="op">(</span><span class="va">spe</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hoods</span><span class="op">)</span><span class="op">)</span>  <span class="co"># entropy &amp; perplexity</span></span></code></pre></div>
 <p>Map entropy/perplexity across the tissue:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">entropy</span>, size <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_color_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"darkslateblue"</span>, high <span class="op">=</span> <span class="st">"gold"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" width="960"></p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">perplexity</span>, size <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_color_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"darkslategray"</span>, high <span class="op">=</span> <span class="st">"gold"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">entropy</span>, size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_color_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"darkslateblue"</span>, high <span class="op">=</span> <span class="st">"gold"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" width="960"></p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">perplexity</span>, size <span class="op">=</span> <span class="fl">1.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_color_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"darkslategray"</span>, high <span class="op">=</span> <span class="st">"gold"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" width="960"></p>
 <p>We can perform neighborhood colocalisation analysis using
 <code>plotColocal</code>. This function compute pearson correlation on
 the probability distribution of each cell. Here we can see in the test
@@ -448,41 +494,41 @@ data, immune cells are more likely to co-localise, luminal progeniotr
 (LP) cells and Basal cells are more likely to colocalise. Cancer cells
 have overall negative correlation to other immune cells, indicating no
 immune infiltration on this sample.</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hood_colocal_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotColocal.html" class="external-link">plotColocal</a></span><span class="op">(</span><span class="va">spe</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hoods</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" width="700"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" width="700"></p>
 <p>We can cluster the cells by their neighborhood probability
 distribution using <code>clustByHood</code>.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">88</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/clustByHood.html" class="external-link">clustByHood</a></span><span class="op">(</span><span class="va">spe</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hoods</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span></code></pre></div>
 <p>We can see what are the neighborhood distributions look like in each
 cluster using <code>plotProbDist</code>.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotProbDist.html" class="external-link">plotProbDist</a></span><span class="op">(</span></span>
 <span>  <span class="va">spe</span>, pm_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">hoods</span><span class="op">)</span>, by_cluster <span class="op">=</span> <span class="cn">TRUE</span>, plot_all <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  fill <span class="op">=</span> <span class="va">hoods</span>, show_clusters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span><span class="op">)</span>, outlier.size <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" width="960"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" width="960"></p>
 <p>We can plot the clusters on the tissue slide, agian using
 <code>plotTissue</code>.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">clusters</span>, size <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">clusters</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">[</span><span class="fl">10</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" width="960"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" width="960"></p>
 <p>We can then mannual annotated the cluster by the distribution of cell
 type neighborhoods.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clust_anno</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  clusters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">9</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  cluster_annotation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"NearCancer"</span>,<span class="st">"Cancer"</span>,<span class="st">"ImmuneTME"</span>,</span>
-<span>    <span class="st">"Cancer"</span>,<span class="st">"ImmuneInfiltration"</span>,<span class="st">"ImmuneInfiltration"</span>,</span>
-<span>    <span class="st">"Cancer"</span>,<span class="st">"TME"</span>,<span class="st">"ImmuneTME"</span></span>
+<span>    <span class="st">"NearCancer"</span>,<span class="st">"Cancer"</span>,<span class="st">"Cancer"</span>,</span>
+<span>    <span class="st">"ImmuneInfiltration"</span>,<span class="st">"ImmuneTME"</span>,<span class="st">"TME"</span>,</span>
+<span>    <span class="st">"TME"</span>,<span class="st">"ImmuneTME"</span>,<span class="st">"ImmuneTME"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -490,11 +536,11 @@ type neighborhoods.</p>
 <span>  <span class="co">#dplyr::select(-cluster_annotation) %&gt;%</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">clust_anno</span>, by <span class="op">=</span> <span class="st">"clusters"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">cluster_annotation</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">cluster_annotation</span>, size <span class="op">=</span> <span class="fl">0.1</span>, reverseY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe</span>, color <span class="op">=</span> <span class="va">cluster_annotation</span>, size <span class="op">=</span> <span class="fl">1</span>, reverseY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" width="960"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="comparing-expression-across-neighborhood-contexts">Comparing expression across neighborhood contexts<a class="anchor" aria-label="anchor" href="#comparing-expression-across-neighborhood-contexts"></a>
@@ -504,7 +550,7 @@ a role in cancer cells from “Near Cancer” and “ImmuneInfiltration”
 neighborhoods.</p>
 <p>We can first subset cells that are “Cancer” cell types and located in
 “NearCancer” and “ImmnueInfiltration” neighborhoods.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe_c_nc</span> <span class="op">&lt;-</span> <span class="va">spe</span><span class="op">[</span>, <span class="va">spe</span><span class="op">$</span><span class="va">cluster_annotation</span> <span class="op">==</span> <span class="st">"NearCancer"</span> <span class="op">&amp;</span> <span class="va">spe</span><span class="op">$</span><span class="va">cell_annotation</span> <span class="op">==</span> <span class="st">"Cancer"</span><span class="op">]</span></span>
 <span><span class="va">spe_c_nc</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="st">"Cancer_NearCancerHoods"</span></span>
 <span></span>
@@ -512,11 +558,11 @@ neighborhoods.</p>
 <span><span class="va">spe_c_ii</span><span class="op">$</span><span class="va">group</span> <span class="op">&lt;-</span> <span class="st">"Cancer_ImmuneInfiltrationHoods"</span></span>
 <span></span>
 <span><span class="va">spe_subset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">spe_c_nc</span>, <span class="va">spe_c_ii</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe_subset</span>, size <span class="op">=</span> <span class="fl">0.1</span>, color <span class="op">=</span> <span class="va">group</span>, reverseY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://davislaboratory.github.io/hoodscanR/reference/plotTissue.html" class="external-link">plotTissue</a></span><span class="op">(</span><span class="va">spe_subset</span>, size <span class="op">=</span> <span class="fl">2</span>, color <span class="op">=</span> <span class="va">group</span>, reverseY <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tomato"</span>, <span class="st">"royalblue"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>override.aes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">15</span>, size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" width="960">
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" width="960">
 We can then perform differential expression (DE) analysis comparing
 cancer cells from different neighborhoods. DE can be performed in
 single-cell style, i.e. using tools like <code>Seurat</code> or
@@ -526,7 +572,7 @@ single-cell style, i.e. using tools like <code>Seurat</code> or
 using pseudo-bulk strategy with DE pipeline such as <code>edgeR</code>
 or <code>limma-voom</code> to give a more robust statistical
 inference.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/CreateSeuratObject.html" class="external-link">CreateSeuratObject</a></span><span class="op">(</span></span>
@@ -544,13 +590,7 @@ inference.</p>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">score</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">Seurat</span><span class="fu">::</span><span class="fu"><a href="https://satijalab.org/seurat/reference/DoHeatmap.html" class="external-link">DoHeatmap</a></span><span class="op">(</span><span class="va">seu</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">de_df</span>, n <span class="op">=</span> <span class="fl">30</span><span class="op">)</span><span class="op">)</span>, label <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" width="700"></p>
-<blockquote>
-<p><strong>Try it yourself:</strong> Re‑run the analysis with
-<code>k = 30</code> and <code>k = 80</code> when running
-<code>findNearCells</code>. How do entropy/perplexity or neighborhoods
-change?</p>
-</blockquote>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-27-1.png" class="r-plt" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -560,7 +600,7 @@ scider<a class="anchor" aria-label="anchor" href="#part-b-celltype-density-roi-a
 <style type="text/css">
   body { font-size: 12pt; }
 </style>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>echo <span class="op">=</span> <span class="cn">TRUE</span>, message <span class="op">=</span> <span class="cn">FALSE</span>, warning <span class="op">=</span> <span class="cn">FALSE</span>, dpi <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChenLaboratory/scider" class="external-link">scider</a></span><span class="op">)</span><span class="op">)</span></span>
@@ -572,13 +612,13 @@ analyses.</p>
 <div class="section level3">
 <h3 id="installation-1">Installation<a class="anchor" aria-label="anchor" href="#installation-1"></a>
 </h3>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://bioconductor.github.io/BiocManager/" class="external-link">"BiocManager"</a></span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"scider"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")</span></span>
+<span><span class="co"># BiocManager::install("scider")</span></span>
 <span></span>
 <span><span class="co"># Development version</span></span>
 <span><span class="co"># devtools::install_github("ChenLaboratory/scider")</span></span></code></pre></div>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChenLaboratory/scider" class="external-link">scider</a></span><span class="op">)</span></span></code></pre></div>
 <p>scider is a R package providing functions to model the global density
 of cells in a slide of spatial transcriptomics data. Same as hoodscanR,
@@ -592,14 +632,14 @@ detection analysis and differential density analysis.</p>
 <h3 id="load-data">Load data<a class="anchor" aria-label="anchor" href="#load-data"></a>
 </h3>
 <p>Again, we will use the same Xenium Breast Cancer dataset.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1.RDS"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1_downsampled.RDS"</span><span class="op">)</span></span></code></pre></div>
 <p>Similarly, in scider, we can use the function
 <code>plotSpatial</code> to visualise the cell position and color the
 cells by cell types.</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">spe</span>, group.by <span class="op">=</span> <span class="st">"cell_type"</span>, pt.alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-31-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-32-1.png" class="r-plt" width="1458.33333333333"></p>
 </div>
 <div class="section level3">
 <h3 id="gridbased-analysis">Grid‑based analysis<a class="anchor" aria-label="anchor" href="#gridbased-analysis"></a>
@@ -610,83 +650,83 @@ cells by cell types.</p>
 <p>We can perform density calculation for each cell type using function
 <code>gridDensity</code>. The calculated density and grid information
 are saved in the metadata of the SpatialExperimnet object.</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/gridDensity.html" class="external-link">gridDensity</a></span><span class="op">(</span><span class="va">spe</span>, id <span class="op">=</span> <span class="st">"cell_type"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">metadata</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "grid_density" "grid_info"</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">metadata</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">$</span><span class="va">grid_density</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 4864 rows and 16 columns</span></span>
-<span><span class="co">##         x_grid    y_grid    node_x    node_y        node   density_b</span></span>
-<span><span class="co">##      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt;   &lt;numeric&gt;</span></span>
-<span><span class="co">## 1      2.13252   3.64226         1         1         1-1 0.000185126</span></span>
-<span><span class="co">## 2    102.13252   3.64226         2         1         2-1 0.006739464</span></span>
-<span><span class="co">## 3    202.13252   3.64226         3         1         3-1 0.109768327</span></span>
-<span><span class="co">## 4    302.13252   3.64226         4         1         4-1 0.644747562</span></span>
-<span><span class="co">## 5    402.13252   3.64226         5         1         5-1 1.319331117</span></span>
-<span><span class="co">## ...        ...       ...       ...       ...         ...         ...</span></span>
-<span><span class="co">## 4860   7152.13    5459.6        72        64       72-64   0.1709555</span></span>
-<span><span class="co">## 4861   7252.13    5459.6        73        64       73-64   0.3407370</span></span>
-<span><span class="co">## 4862   7352.13    5459.6        74        64       74-64   0.3282471</span></span>
-<span><span class="co">## 4863   7452.13    5459.6        75        64       75-64   0.1971980</span></span>
-<span><span class="co">## 4864   7552.13    5459.6        76        64       76-64   0.0758587</span></span>
+<span><span class="co">##         x_grid    y_grid    node_x    node_y        node  density_b</span></span>
+<span><span class="co">##      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;character&gt;  &lt;numeric&gt;</span></span>
+<span><span class="co">## 1      3.44018   5.24616         1         1         1-1  0.0136778</span></span>
+<span><span class="co">## 2    103.44018   5.24616         2         1         2-1  0.0254621</span></span>
+<span><span class="co">## 3    203.44018   5.24616         3         1         3-1  0.0413941</span></span>
+<span><span class="co">## 4    303.44018   5.24616         4         1         4-1  0.0567465</span></span>
+<span><span class="co">## 5    403.44018   5.24616         5         1         5-1  0.0639556</span></span>
+<span><span class="co">## ...        ...       ...       ...       ...         ...        ...</span></span>
+<span><span class="co">## 4860   7153.44   5461.21        72        64       72-64 0.00250819</span></span>
+<span><span class="co">## 4861   7253.44   5461.21        73        64       73-64 0.00248650</span></span>
+<span><span class="co">## 4862   7353.44   5461.21        74        64       74-64 0.00214826</span></span>
+<span><span class="co">## 4863   7453.44   5461.21        75        64       75-64 0.00176898</span></span>
+<span><span class="co">## 4864   7553.44   5461.21        76        64       76-64 0.00151352</span></span>
 <span><span class="co">##      density_basal density_cancer density_endothelial density_fibroblast</span></span>
 <span><span class="co">##          &lt;numeric&gt;      &lt;numeric&gt;           &lt;numeric&gt;          &lt;numeric&gt;</span></span>
-<span><span class="co">## 1         0.653039        8.08791             1.06945            1.15859</span></span>
-<span><span class="co">## 2         0.642318       12.02509             1.21094            1.64778</span></span>
-<span><span class="co">## 3         0.380197       20.69236             1.11249            2.08086</span></span>
-<span><span class="co">## 4         0.126370       25.79031             1.37954            2.91032</span></span>
-<span><span class="co">## 5         0.356585       18.28568             1.75609            5.09484</span></span>
+<span><span class="co">## 1       0.00578242        3.69455            0.294356           0.196549</span></span>
+<span><span class="co">## 2       0.01649517        3.92956            0.280853           0.242395</span></span>
+<span><span class="co">## 3       0.04190043        4.10132            0.273483           0.317257</span></span>
+<span><span class="co">## 4       0.09155611        4.21823            0.274528           0.405877</span></span>
+<span><span class="co">## 5       0.16752020        4.39767            0.281366           0.470655</span></span>
 <span><span class="co">## ...            ...            ...                 ...                ...</span></span>
-<span><span class="co">## 4860       7.16655       26.07912            0.920266            4.57985</span></span>
-<span><span class="co">## 4861       5.92327       12.58503            1.235386            6.40674</span></span>
-<span><span class="co">## 4862       3.95138        5.46712            1.311451            6.35234</span></span>
-<span><span class="co">## 4863       4.21118        7.59530            1.113430            5.09582</span></span>
-<span><span class="co">## 4864       4.54376        9.88099            0.830423            3.20955</span></span>
+<span><span class="co">## 4860      0.660856        2.16673            0.227697           1.060322</span></span>
+<span><span class="co">## 4861      0.652468        2.09274            0.242455           0.959035</span></span>
+<span><span class="co">## 4862      0.604787        2.00462            0.235283           0.850291</span></span>
+<span><span class="co">## 4863      0.546192        1.99801            0.208185           0.741357</span></span>
+<span><span class="co">## 4864      0.491739        2.05538            0.169969           0.634689</span></span>
 <span><span class="co">##      density_lp density_macrophage density_mast density_pericyte density_t_nk</span></span>
 <span><span class="co">##       &lt;numeric&gt;          &lt;numeric&gt;    &lt;numeric&gt;        &lt;numeric&gt;    &lt;numeric&gt;</span></span>
-<span><span class="co">## 1    0.03771750           0.764217  8.28899e-06         0.325916    0.0526858</span></span>
-<span><span class="co">## 2    0.04556502           1.236752  1.13504e-05         0.441117    0.2251303</span></span>
-<span><span class="co">## 3    0.02412946           2.364783  1.59737e-04         0.457129    0.7139376</span></span>
-<span><span class="co">## 4    0.00620766           3.242121  1.59131e-03         0.332122    1.5342735</span></span>
-<span><span class="co">## 5    0.02878974           2.727866  5.86964e-03         0.202607    2.3672877</span></span>
+<span><span class="co">## 1    0.00102109           0.127496   0.00328644        0.0453230    0.0674213</span></span>
+<span><span class="co">## 2    0.00319990           0.146139   0.00695295        0.0562421    0.0848778</span></span>
+<span><span class="co">## 3    0.00876861           0.161572   0.01284611        0.0711017    0.0990458</span></span>
+<span><span class="co">## 4    0.02029653           0.170810   0.01997703        0.0907528    0.1036577</span></span>
+<span><span class="co">## 5    0.03862952           0.179666   0.02544209        0.1122147    0.0938794</span></span>
 <span><span class="co">## ...         ...                ...          ...              ...          ...</span></span>
-<span><span class="co">## 4860   4.087987           0.837792  0.028396408       0.37175527    0.8905695</span></span>
-<span><span class="co">## 4861   2.376304           0.873325  0.042272851       0.41815150    0.8516191</span></span>
-<span><span class="co">## 4862   0.933148           0.490780  0.024095772       0.18571650    0.4158388</span></span>
-<span><span class="co">## 4863   0.772963           0.270787  0.004806929       0.03184891    0.1239474</span></span>
-<span><span class="co">## 4864   0.580467           0.164666  0.000419773       0.00254799    0.0289314</span></span>
+<span><span class="co">## 4860   0.338591           0.195647  0.002983129       0.07538390     0.208735</span></span>
+<span><span class="co">## 4861   0.364480           0.195981  0.002107648       0.03106248     0.240008</span></span>
+<span><span class="co">## 4862   0.350601           0.173952  0.001370364       0.01078686     0.232854</span></span>
+<span><span class="co">## 4863   0.318911           0.138645  0.000800116       0.00337854     0.198144</span></span>
+<span><span class="co">## 4864   0.285185           0.102290  0.000420181       0.00103729     0.154420</span></span>
 <span><span class="co">##      density_overall</span></span>
 <span><span class="co">##            &lt;numeric&gt;</span></span>
-<span><span class="co">## 1            12.1497</span></span>
-<span><span class="co">## 2            17.4814</span></span>
-<span><span class="co">## 3            27.9358</span></span>
-<span><span class="co">## 4            35.9676</span></span>
-<span><span class="co">## 5            32.1449</span></span>
+<span><span class="co">## 1            4.44947</span></span>
+<span><span class="co">## 2            4.79218</span></span>
+<span><span class="co">## 3            5.12869</span></span>
+<span><span class="co">## 4            5.45244</span></span>
+<span><span class="co">## 5            5.83099</span></span>
 <span><span class="co">## ...              ...</span></span>
-<span><span class="co">## 4860         45.1332</span></span>
-<span><span class="co">## 4861         31.0528</span></span>
-<span><span class="co">## 4862         19.4601</span></span>
-<span><span class="co">## 4863         19.4173</span></span>
-<span><span class="co">## 4864         19.3176</span></span></code></pre>
+<span><span class="co">## 4860         4.93945</span></span>
+<span><span class="co">## 4861         4.78282</span></span>
+<span><span class="co">## 4862         4.46669</span></span>
+<span><span class="co">## 4863         4.15539</span></span>
+<span><span class="co">## 4864         3.89664</span></span></code></pre>
 <p>We can visualise the overall cell density of the whole tissue using
 function <code>plotDensity</code>.</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotDensity.html" class="external-link">plotDensity</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-33-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" width="1458.33333333333"></p>
 <p>The parameter <code>probs</code> control the filtering when plotting.
 Since we didn’t specify cell type of interest in <code>coi</code>
 parameter when running <code>gridDensity</code>. It will compute cell
 density of all cell types. In a tumor sample, usually cancer region
 would have higher cell density.</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotDensity.html" class="external-link">plotDensity</a></span><span class="op">(</span><span class="va">spe</span>, probs <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-34-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-35-1.png" class="r-plt" width="1458.33333333333"></p>
 <p>We can also visualise the density of individual cell type, e.g.,
 fibroblast cells or cancer cells.</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotDensity.html" class="external-link">plotDensity</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Fibroblast"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotDensity.html" class="external-link">plotDensity</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-35-1.png" class="r-plt" width="2400"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-36-1.png" class="r-plt" width="2400"></p>
 </div>
 <div class="section level4">
 <h4 id="find-regions-of-interest-rois">Find Regions of Interest (ROIs)<a class="anchor" aria-label="anchor" href="#find-regions-of-interest-rois"></a>
@@ -698,33 +738,33 @@ regions-of-interest (ROIs) based on density or select by user.</p>
 <p>The detected ROIs are saved in the metadata of the SpatialExperiment
 object.</p>
 <p>Here we identify ROIs based on the cancer cell density.</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span>
 <span><span class="fu">metadata</span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">$</span><span class="va">cancer_roi</span></span></code></pre></div>
-<pre><code><span><span class="co">## DataFrame with 606 rows and 6 columns</span></span>
+<pre><code><span><span class="co">## DataFrame with 705 rows and 6 columns</span></span>
 <span><span class="co">##     component     members           x           y    xcoord    ycoord</span></span>
 <span><span class="co">##      &lt;factor&gt; &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">## 1           1        29-9          29           9   2802.13   696.463</span></span>
-<span><span class="co">## 2           1        30-9          30           9   2902.13   696.463</span></span>
-<span><span class="co">## 3           1       27-10          27          10   2652.13   783.065</span></span>
-<span><span class="co">## 4           1       28-10          28          10   2752.13   783.065</span></span>
-<span><span class="co">## 5           1       29-10          29          10   2852.13   783.065</span></span>
+<span><span class="co">## 1           1         1-1           1           1   3.44018   5.24616</span></span>
+<span><span class="co">## 2           1         2-1           2           1 103.44018   5.24616</span></span>
+<span><span class="co">## 3           1         3-1           3           1 203.44018   5.24616</span></span>
+<span><span class="co">## 4           1         4-1           4           1 303.44018   5.24616</span></span>
+<span><span class="co">## 5           1         5-1           5           1 403.44018   5.24616</span></span>
 <span><span class="co">## ...       ...         ...         ...         ...       ...       ...</span></span>
-<span><span class="co">## 602         9        8-14           8          14   752.133   1129.48</span></span>
-<span><span class="co">## 603         9        9-14           9          14   852.133   1129.48</span></span>
-<span><span class="co">## 604         9       10-14          10          14   952.133   1129.48</span></span>
-<span><span class="co">## 605         9        8-15           8          15   702.133   1216.08</span></span>
-<span><span class="co">## 606         9        9-15           9          15   802.133   1216.08</span></span></code></pre>
+<span><span class="co">## 701         7       61-42          61          42   6053.44   3555.95</span></span>
+<span><span class="co">## 702         7       62-42          62          42   6153.44   3555.95</span></span>
+<span><span class="co">## 703         7       63-42          63          42   6253.44   3555.95</span></span>
+<span><span class="co">## 704         7       62-43          62          43   6103.44   3642.55</span></span>
+<span><span class="co">## 705         7       63-43          63          43   6203.44   3642.55</span></span></code></pre>
 <p>We can visualise the ROIs with function <code>plotROI</code>.</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotROI.html" class="external-link">plotROI</a></span><span class="op">(</span><span class="va">spe</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-37-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" width="1458.33333333333"></p>
 <p>Many parameters can be tuned in <code><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI()</a></code>. The
 <code>method</code> control what algorithm to be used when defining ROIs
 (Greedy, Walktrap, Connected, HDbscan etc). The <code>probs</code>
 control the proportion of cells (based on density) that go into the
 identification of ROIs.</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span>, probs <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span>
 <span><span class="va">spe2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span>, probs <span class="op">=</span> <span class="fl">0.6</span>, method <span class="op">=</span> <span class="st">"connected"</span><span class="op">)</span></span>
 <span><span class="va">spe3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span>, probs <span class="op">=</span> <span class="fl">0.6</span>, method <span class="op">=</span> <span class="st">"walktrap"</span><span class="op">)</span></span>
@@ -734,8 +774,8 @@ identification of ROIs.</p>
 <span>  <span class="op">(</span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotROI.html" class="external-link">plotROI</a></span><span class="op">(</span><span class="va">spe2</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Connected"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="op">(</span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotROI.html" class="external-link">plotROI</a></span><span class="op">(</span><span class="va">spe3</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Walktrap"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="op">(</span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotROI.html" class="external-link">plotROI</a></span><span class="op">(</span><span class="va">spe4</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"HDbscan"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-38-1.png" class="r-plt" width="2400"></p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-39-1.png" class="r-plt" width="2400"></p>
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/findROI.html" class="external-link">findROI</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span>, probs <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -745,74 +785,74 @@ identification of ROIs.</p>
 two cell types within each ROI or overall but account for ROI variation
 using a cubic spline or a linear fit. This can be done with function
 <code>corrDensity</code>.</p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor.res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/corDensity.html" class="external-link">corDensity</a></span><span class="op">(</span><span class="va">spe</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
 <p>We can see the correlation between each pair of cell types in each
 ROI.</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor.res</span><span class="op">$</span><span class="va">ROI</span></span></code></pre></div>
-<pre><code><span><span class="co">## DataFrame with 720 rows and 9 columns</span></span>
+<pre><code><span><span class="co">## DataFrame with 495 rows and 9 columns</span></span>
 <span><span class="co">##       celltype1   celltype2         ROI     ngrid   cor.coef         t</span></span>
 <span><span class="co">##     &lt;character&gt; &lt;character&gt; &lt;character&gt; &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">## 1             B       Basal           1       257   0.613703  4.583012</span></span>
-<span><span class="co">## 2             B       Basal           2        36  -0.624783 -2.577679</span></span>
-<span><span class="co">## 3             B       Basal           3        76  -0.183509 -0.595102</span></span>
-<span><span class="co">## 4             B       Basal           4       248   0.448324  3.393524</span></span>
-<span><span class="co">## 5             B       Basal           5       256   0.341926  3.920226</span></span>
+<span><span class="co">## 1             B       Basal           1        82  0.4639830  1.116349</span></span>
+<span><span class="co">## 2             B       Basal           2        96  0.3879847  1.461223</span></span>
+<span><span class="co">## 3             B       Basal           3        28  0.0813146  0.197466</span></span>
+<span><span class="co">## 4             B       Basal           4        34 -0.7833515 -2.728469</span></span>
+<span><span class="co">## 5             B       Basal           5       255  0.0945044  0.280668</span></span>
 <span><span class="co">## ...         ...         ...         ...       ...        ...       ...</span></span>
-<span><span class="co">## 716    Pericyte        T nk          12       135  0.1000424  0.708760</span></span>
-<span><span class="co">## 717    Pericyte        T nk          13       119 -0.1559238 -0.700237</span></span>
-<span><span class="co">## 718    Pericyte        T nk          14        34  0.9206055  6.326670</span></span>
-<span><span class="co">## 719    Pericyte        T nk          15       105  0.5931799  4.279033</span></span>
-<span><span class="co">## 720    Pericyte        T nk          16        50  0.0660313  0.264615</span></span>
-<span><span class="co">##            df       p.Pos     p.Neg</span></span>
-<span><span class="co">##     &lt;numeric&gt;   &lt;numeric&gt; &lt;numeric&gt;</span></span>
-<span><span class="co">## 1     34.7640 2.84252e-05  0.999972</span></span>
-<span><span class="co">## 2     10.3771 9.86605e-01  0.013395</span></span>
-<span><span class="co">## 3     10.1622 7.17604e-01  0.282396</span></span>
-<span><span class="co">## 4     45.7792 7.16520e-04  0.999283</span></span>
-<span><span class="co">## 5    116.0812 7.50403e-05  0.999925</span></span>
-<span><span class="co">## ...       ...         ...       ...</span></span>
-<span><span class="co">## 716  49.68923 0.240892753  0.759107</span></span>
-<span><span class="co">## 717  19.67777 0.754011906  0.245988</span></span>
-<span><span class="co">## 718   7.20164 0.000175331  0.999825</span></span>
-<span><span class="co">## 719  33.72761 0.000073172  0.999927</span></span>
-<span><span class="co">## 720  15.98938 0.397343416  0.602657</span></span></code></pre>
+<span><span class="co">## 491    Pericyte        T nk           7       283   0.156737  0.572078</span></span>
+<span><span class="co">## 492    Pericyte        T nk           8       313  -0.111559 -0.548588</span></span>
+<span><span class="co">## 493    Pericyte        T nk           9       322   0.413364  1.609565</span></span>
+<span><span class="co">## 494    Pericyte        T nk          10        79   0.759291  2.910885</span></span>
+<span><span class="co">## 495    Pericyte        T nk          11       100   0.484487  1.583253</span></span>
+<span><span class="co">##            df     p.Pos     p.Neg</span></span>
+<span><span class="co">##     &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;</span></span>
+<span><span class="co">## 1     4.54266 0.1599073 0.8400927</span></span>
+<span><span class="co">## 2    12.04899 0.0847689 0.9152311</span></span>
+<span><span class="co">## 3     5.85826 0.4250676 0.5749324</span></span>
+<span><span class="co">## 4     4.68724 0.9778585 0.0221415</span></span>
+<span><span class="co">## 5     8.74151 0.3927471 0.6072529</span></span>
+<span><span class="co">## ...       ...       ...       ...</span></span>
+<span><span class="co">## 491  12.99471 0.2885162  0.711484</span></span>
+<span><span class="co">## 492  23.88065 0.7058097  0.294190</span></span>
+<span><span class="co">## 493  12.57114 0.0661522  0.933848</span></span>
+<span><span class="co">## 494   6.22392 0.0129198  0.987080</span></span>
+<span><span class="co">## 495   8.17243 0.0756135  0.924387</span></span></code></pre>
 <p>Or the correlation between each pair of cell types across the whole
 slide:</p>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor.res</span><span class="op">$</span><span class="va">overall</span></span></code></pre></div>
 <pre><code><span><span class="co">## DataFrame with 45 rows and 5 columns</span></span>
-<span><span class="co">##       celltype1   celltype2  cor.coef       p.Pos       p.Neg</span></span>
-<span><span class="co">##     &lt;character&gt; &lt;character&gt; &lt;numeric&gt;   &lt;numeric&gt;   &lt;numeric&gt;</span></span>
-<span><span class="co">## 1             B       Basal  0.126945 1.01588e-07 8.82617e-01</span></span>
-<span><span class="co">## 2             B      Cancer -0.416750 1.00000e+00 2.54999e-18</span></span>
-<span><span class="co">## 3             B Endothelial  0.427315 2.46201e-16 1.00000e+00</span></span>
-<span><span class="co">## 4             B  Fibroblast  0.585464 3.56212e-33 1.00000e+00</span></span>
-<span><span class="co">## 5             B          Lp -0.025167 1.06853e-02 2.52989e-01</span></span>
-<span><span class="co">## ...         ...         ...       ...         ...         ...</span></span>
-<span><span class="co">## 41   Macrophage    Pericyte  0.427478 1.51610e-11    0.999995</span></span>
-<span><span class="co">## 42   Macrophage        T nk  0.788646 2.38150e-57    1.000000</span></span>
-<span><span class="co">## 43         Mast    Pericyte  0.215193 3.54508e-04    0.998188</span></span>
-<span><span class="co">## 44         Mast        T nk  0.324211 1.70144e-07    0.999852</span></span>
-<span><span class="co">## 45     Pericyte        T nk  0.444070 4.66862e-15    0.999985</span></span></code></pre>
+<span><span class="co">##       celltype1   celltype2   cor.coef       p.Pos       p.Neg</span></span>
+<span><span class="co">##     &lt;character&gt; &lt;character&gt;  &lt;numeric&gt;   &lt;numeric&gt;   &lt;numeric&gt;</span></span>
+<span><span class="co">## 1             B       Basal  0.2198401 1.21963e-07 8.96908e-01</span></span>
+<span><span class="co">## 2             B      Cancer -0.3922477 9.98836e-01 3.98397e-06</span></span>
+<span><span class="co">## 3             B Endothelial  0.3486397 1.55645e-05 9.98815e-01</span></span>
+<span><span class="co">## 4             B  Fibroblast  0.6186526 2.62767e-12 9.99993e-01</span></span>
+<span><span class="co">## 5             B          Lp  0.0699756 1.60630e-02 7.93106e-01</span></span>
+<span><span class="co">## ...         ...         ...        ...         ...         ...</span></span>
+<span><span class="co">## 41   Macrophage    Pericyte   0.438590 8.50497e-05    0.998230</span></span>
+<span><span class="co">## 42   Macrophage        T nk   0.785632 5.82966e-21    1.000000</span></span>
+<span><span class="co">## 43         Mast    Pericyte   0.378358 5.55024e-03    0.973966</span></span>
+<span><span class="co">## 44         Mast        T nk   0.304846 6.20142e-05    0.998503</span></span>
+<span><span class="co">## 45     Pericyte        T nk   0.336492 4.26117e-04    0.745982</span></span></code></pre>
 <p>We can then visualise the statistics between each pair of cell types
 using function <code>plotCorHeatmap</code> in the ROIs</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotCorHeatmap.html" class="external-link">plotCorHeatmap</a></span><span class="op">(</span><span class="va">cor.res</span><span class="op">$</span><span class="va">ROI</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-43-1.png" class="r-plt" width="1200"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-44-1.png" class="r-plt" width="1200"></p>
 <p>Or the correlation between cell type pairs across the whole
 slide:</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotCorHeatmap.html" class="external-link">plotCorHeatmap</a></span><span class="op">(</span><span class="va">cor.res</span><span class="op">$</span><span class="va">overall</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-44-1.png" class="r-plt" width="1000"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-45-1.png" class="r-plt" width="1000"></p>
 <p>We can look back at the co-localisation done by hoodscanR, since we
 were using cell types as the annotation to calculate the neighborhood
 probability matrix, we can see that at whole slide level, both methods
 generate very similar results.</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hood_colocal_p</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-45-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-46-1.png" class="r-plt" width="1458.33333333333"></p>
 <p>But in scider, we can focus on ROIs, we can also visualise a fitted
 pairwise relationship and its heterogeneity across ROIs.</p>
 <p>We can see that in different cancer ROIs, the co-localisation status
@@ -821,9 +861,9 @@ they are positively correlated in ROI1 and ROI4, but negatively
 correlated in ROI12 and ROI16.</p>
 <p>Spatial pattern might be vary depends on tissue context, using scider
 can offer a more precise approach by examining it in different ROI.</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotDensCor.html" class="external-link">plotDensCor</a></span><span class="op">(</span><span class="va">spe</span>, celltype1 <span class="op">=</span> <span class="st">"Basal"</span>, celltype2 <span class="op">=</span> <span class="st">"LP"</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotROI.html" class="external-link">plotROI</a></span><span class="op">(</span><span class="va">spe</span>, roi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-46-1.png" class="r-plt" width="2400"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-47-1.png" class="r-plt" width="2400"></p>
 </div>
 </div>
 <div class="section level3">
@@ -839,29 +879,29 @@ cell type from a different level of cancer region.</p>
 <p>To address this question, we first need to divide cells into
 different levels of grid density. This can be done using a contour
 identification strategy with function <code>getContour</code>.</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/getContour.html" class="external-link">getContour</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
 <p>Different level of contour can be visualised with cells using
 <code>plotContour</code>.</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotContour.html" class="external-link">plotContour</a></span><span class="op">(</span><span class="va">spe</span>, coi <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-48-1.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-49-1.png" class="r-plt" width="1458.33333333333"></p>
 <p>We can then annotate cells by their locations within each contour
 using function <code>allocateCells</code>.</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/allocateCells.html" class="external-link">allocateCells</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span></span></code></pre></div>
 <p>We can visualise the continous regions on the tissue based on cancer
 density.</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">spe</span>, group.by <span class="op">=</span> <span class="st">"cancer_contour"</span>, pt.alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-50-1.png" class="r-plt" width="1458.33333333333"></p>
-<p>Compare composition per level:</p>
 <div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotCellCompo.html" class="external-link">plotCellCompo</a></span><span class="op">(</span><span class="va">spe</span>, contour <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotSpatial.html" class="external-link">plotSpatial</a></span><span class="op">(</span><span class="va">spe</span>, group.by <span class="op">=</span> <span class="st">"cancer_contour"</span>, pt.alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-51-1.png" class="r-plt" width="1458.33333333333"></p>
+<p>Compare composition per level:</p>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotCellCompo.html" class="external-link">plotCellCompo</a></span><span class="op">(</span><span class="va">spe</span>, contour <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-52-1.png" class="r-plt" width="1458.33333333333"></p>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/plotCellCompo.html" class="external-link">plotCellCompo</a></span><span class="op">(</span><span class="va">spe</span>, contour <span class="op">=</span> <span class="st">"Cancer"</span>, self.included <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-51-2.png" class="r-plt" width="1458.33333333333"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-52-2.png" class="r-plt" width="1458.33333333333"></p>
 </div>
 </div>
 <div class="section level3">
@@ -871,123 +911,123 @@ density.</p>
 have different transcriptomics profiles, one way to do this is by using
 the <code>spe2PB</code> function to pseudobulk the data by contour and
 cell types.</p>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://chenlaboratory.github.io/scider/reference/spe2PB.html" class="external-link">spe2PB</a></span><span class="op">(</span><span class="va">spe</span>, contour <span class="op">=</span> <span class="st">"Cancer"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">y</span></span></code></pre></div>
 <pre><code><span><span class="co">## An object of class "DGEList"</span></span>
 <span><span class="co">## $counts</span></span>
 <span><span class="co">##        B_Lv0 B_Lv1 B_Lv2 B_Lv3 B_Lv4 B_Lv5 B_Lv6 B_Lv7 B_Lv8 B_Lv9 Basal_Lv0</span></span>
-<span><span class="co">## ABCC11   146    16     9     8     3     4     1     3     2     2       679</span></span>
-<span><span class="co">## ACTA2   1185   140    70    21    31     9    17    11     4     0     24936</span></span>
-<span><span class="co">## ACTG2   2527   121    59    29    16    24    12     4     6     3     17699</span></span>
-<span><span class="co">## ADAM9    550    55    23    12     5     5    12     1     1     1      3736</span></span>
-<span><span class="co">## ADGRE5  1254   124    32    26    10    11     8     4     4     0       651</span></span>
+<span><span class="co">## ABCC11    13     3     4     1     1     0     0     1     0     1        95</span></span>
+<span><span class="co">## ACTA2    132    12    31     5     8     1     0     4     1     3      2966</span></span>
+<span><span class="co">## ACTG2    312    17    13    12     4     1     0     1     0     3      2102</span></span>
+<span><span class="co">## ADAM9     70     9    10     5     0     2     0     2     0     0       460</span></span>
+<span><span class="co">## ADGRE5   138    20    17     5     1     1     1     2     0     0        91</span></span>
 <span><span class="co">##        Basal_Lv1 Basal_Lv2 Basal_Lv3 Basal_Lv4 Basal_Lv5 Basal_Lv6 Basal_Lv7</span></span>
-<span><span class="co">## ABCC11       701       189       136        71        35        53        17</span></span>
-<span><span class="co">## ACTA2      11649      4069      2610      1146       680       571       371</span></span>
-<span><span class="co">## ACTG2       8585      3125      1791       813       498       371       189</span></span>
-<span><span class="co">## ADAM9       1394       516       354       138        77        80        52</span></span>
-<span><span class="co">## ADGRE5       304       100        48        31         9        12         6</span></span>
+<span><span class="co">## ABCC11        39        20        29        25        10         9         3</span></span>
+<span><span class="co">## ACTA2        950       542       431       260       171       137        99</span></span>
+<span><span class="co">## ACTG2        639       403       385       249       160        79        58</span></span>
+<span><span class="co">## ADAM9        106        55        66        35        21        12        17</span></span>
+<span><span class="co">## ADGRE5        27        11        14         7         5         0         1</span></span>
 <span><span class="co">##        Basal_Lv8 Basal_Lv9 Cancer_Lv0 Cancer_Lv1 Cancer_Lv2 Cancer_Lv3</span></span>
-<span><span class="co">## ABCC11        25        37       8503      13697      15743      17499</span></span>
-<span><span class="co">## ACTA2        409       814       9957       9513       7716       6933</span></span>
-<span><span class="co">## ACTG2        214       427      13822      13834      13069      12364</span></span>
-<span><span class="co">## ADAM9         76       145      10750      10032      10521      11287</span></span>
-<span><span class="co">## ADGRE5         9        12        449        376        310        305</span></span>
+<span><span class="co">## ABCC11         4        13        909       1492       1647       2129</span></span>
+<span><span class="co">## ACTA2         59       235       1109        833        745        964</span></span>
+<span><span class="co">## ACTG2         30        94       1660       1395       1402       1615</span></span>
+<span><span class="co">## ADAM9          8        38       1236       1014       1107       1278</span></span>
+<span><span class="co">## ADGRE5         0         3         60         50         38         31</span></span>
 <span><span class="co">##        Cancer_Lv4 Cancer_Lv5 Cancer_Lv6 Cancer_Lv7 Cancer_Lv8 Cancer_Lv9</span></span>
-<span><span class="co">## ABCC11      17501      17709      16259      20672      14200      10924</span></span>
-<span><span class="co">## ACTA2        6338       6684       5726       6862       4390       4034</span></span>
-<span><span class="co">## ACTG2       11381      11303      10637      12781       9170       9550</span></span>
-<span><span class="co">## ADAM9       11035      10965      10072      12492       9105      10739</span></span>
-<span><span class="co">## ADGRE5        239        231        191        211        154        133</span></span>
+<span><span class="co">## ABCC11       1987       1958       2153       2240       2269       1528</span></span>
+<span><span class="co">## ACTA2         789        772        665        790        695        625</span></span>
+<span><span class="co">## ACTG2        1318       1309       1309       1518       1344       1215</span></span>
+<span><span class="co">## ADAM9        1280       1223       1295       1509       1400       1398</span></span>
+<span><span class="co">## ADGRE5         28         28         22         29         23         15</span></span>
 <span><span class="co">##        Endothelial_Lv0 Endothelial_Lv1 Endothelial_Lv2 Endothelial_Lv3</span></span>
-<span><span class="co">## ABCC11             391             151             120             132</span></span>
-<span><span class="co">## ACTA2            14483            3059            1706            1559</span></span>
-<span><span class="co">## ACTG2             5840            1177             648             532</span></span>
-<span><span class="co">## ADAM9             3544             829             552             430</span></span>
-<span><span class="co">## ADGRE5            1621             342             226             203</span></span>
+<span><span class="co">## ABCC11              35              25              10              13</span></span>
+<span><span class="co">## ACTA2             1338             393             239             250</span></span>
+<span><span class="co">## ACTG2              578             114              94             109</span></span>
+<span><span class="co">## ADAM9              368              89              72              69</span></span>
+<span><span class="co">## ADGRE5             165              48              37              36</span></span>
 <span><span class="co">##        Endothelial_Lv4 Endothelial_Lv5 Endothelial_Lv6 Endothelial_Lv7</span></span>
-<span><span class="co">## ABCC11              75             125             109              83</span></span>
-<span><span class="co">## ACTA2             1164            1117            1181             973</span></span>
-<span><span class="co">## ACTG2              429             404             495             413</span></span>
-<span><span class="co">## ADAM9              310             388             424             309</span></span>
-<span><span class="co">## ADGRE5             145             127             139             133</span></span>
+<span><span class="co">## ABCC11              10              10              14               5</span></span>
+<span><span class="co">## ACTA2              273             169             119             107</span></span>
+<span><span class="co">## ACTG2               95              75              63              39</span></span>
+<span><span class="co">## ADAM9               64              82              63              29</span></span>
+<span><span class="co">## ADGRE5              29              16              16              18</span></span>
 <span><span class="co">##        Endothelial_Lv8 Endothelial_Lv9 Fibroblast_Lv0 Fibroblast_Lv1</span></span>
-<span><span class="co">## ABCC11              33              36           7123            872</span></span>
-<span><span class="co">## ACTA2              362             358          90994          11074</span></span>
-<span><span class="co">## ACTG2              152             142          56910           4158</span></span>
-<span><span class="co">## ADAM9              109             139          37648           2976</span></span>
-<span><span class="co">## ADGRE5              48              58          16418           1119</span></span>
+<span><span class="co">## ABCC11              11               9            711            125</span></span>
+<span><span class="co">## ACTA2              152             112           9841           1337</span></span>
+<span><span class="co">## ACTG2               41              43           6337            670</span></span>
+<span><span class="co">## ADAM9               40              39           4127            465</span></span>
+<span><span class="co">## ADGRE5              12              12           1791            180</span></span>
 <span><span class="co">##        Fibroblast_Lv2 Fibroblast_Lv3 Fibroblast_Lv4 Fibroblast_Lv5</span></span>
-<span><span class="co">## ABCC11            528            385            320            272</span></span>
-<span><span class="co">## ACTA2            5744           4128           2860           2661</span></span>
-<span><span class="co">## ACTG2            1866           1310            824            656</span></span>
-<span><span class="co">## ADAM9            1555           1249            732            696</span></span>
-<span><span class="co">## ADGRE5            484            320            197            170</span></span>
+<span><span class="co">## ABCC11             80             67             62             47</span></span>
+<span><span class="co">## ACTA2             867            720            598            503</span></span>
+<span><span class="co">## ACTG2             343            278            166            130</span></span>
+<span><span class="co">## ADAM9             227            230            145            122</span></span>
+<span><span class="co">## ADGRE5             80             70             53             34</span></span>
 <span><span class="co">##        Fibroblast_Lv6 Fibroblast_Lv7 Fibroblast_Lv8 Fibroblast_Lv9 LP_Lv0</span></span>
-<span><span class="co">## ABCC11            263            154             74             28    139</span></span>
-<span><span class="co">## ACTA2            2353           2014            845            465    942</span></span>
-<span><span class="co">## ACTG2             679            506            177            124   1467</span></span>
-<span><span class="co">## ADAM9             631            547            218            119   1793</span></span>
-<span><span class="co">## ADGRE5            151            121             33             23    268</span></span>
+<span><span class="co">## ABCC11             20             18             22             10     11</span></span>
+<span><span class="co">## ACTA2             368            265            318            130    111</span></span>
+<span><span class="co">## ACTG2             108             55             81             29    158</span></span>
+<span><span class="co">## ADAM9              90             60             57             22    249</span></span>
+<span><span class="co">## ADGRE5             30             26             15              5     39</span></span>
 <span><span class="co">##        LP_Lv1 LP_Lv2 LP_Lv3 LP_Lv4 LP_Lv5 LP_Lv6 LP_Lv7 LP_Lv8 LP_Lv9</span></span>
-<span><span class="co">## ABCC11    313    279    244    119     54     35     57     43     10</span></span>
-<span><span class="co">## ACTA2     428    316    242    111     60     27     65     71     11</span></span>
-<span><span class="co">## ACTG2    1035   1045    750    383    203     90    214    200     35</span></span>
-<span><span class="co">## ADAM9    1115   1384   1163    679    387    210    239    520     47</span></span>
-<span><span class="co">## ADGRE5     91    109     84     42     30     17     12     26      3</span></span>
+<span><span class="co">## ABCC11     46     55     31     24      5      3      1      2      2</span></span>
+<span><span class="co">## ACTA2      31     52     16     18     11      8      6      6      7</span></span>
+<span><span class="co">## ACTG2     126    155     50     56     38     29      8     15      0</span></span>
+<span><span class="co">## ADAM9     181    239    130    100     64     35     33     23      6</span></span>
+<span><span class="co">## ADGRE5     16     17      8     10      5      2      3      1      0</span></span>
 <span><span class="co">##        Macrophage_Lv0 Macrophage_Lv1 Macrophage_Lv2 Macrophage_Lv3</span></span>
-<span><span class="co">## ABCC11            733            219            182            155</span></span>
-<span><span class="co">## ACTA2            6696           1479            692            611</span></span>
-<span><span class="co">## ACTG2           12032           1694           1000            881</span></span>
-<span><span class="co">## ADAM9            5646           1160            785            733</span></span>
-<span><span class="co">## ADGRE5           3915            503            265            193</span></span>
+<span><span class="co">## ABCC11             94             17             21             18</span></span>
+<span><span class="co">## ACTA2             754            107             86             99</span></span>
+<span><span class="co">## ACTG2            1324            159            141            128</span></span>
+<span><span class="co">## ADAM9             605             91            115            108</span></span>
+<span><span class="co">## ADGRE5            442             42             43             27</span></span>
 <span><span class="co">##        Macrophage_Lv4 Macrophage_Lv5 Macrophage_Lv6 Macrophage_Lv7</span></span>
-<span><span class="co">## ABCC11            123            161             97            116</span></span>
-<span><span class="co">## ACTA2             454            466            346            398</span></span>
-<span><span class="co">## ACTG2             611            613            500            501</span></span>
-<span><span class="co">## ADAM9             563            560            406            478</span></span>
-<span><span class="co">## ADGRE5            124            126             83            100</span></span>
+<span><span class="co">## ABCC11             23             19             21             21</span></span>
+<span><span class="co">## ACTA2              96             83             61             47</span></span>
+<span><span class="co">## ACTG2              97             97             61             62</span></span>
+<span><span class="co">## ADAM9              78            106             61             69</span></span>
+<span><span class="co">## ADGRE5             28             25             12             15</span></span>
 <span><span class="co">##        Macrophage_Lv8 Macrophage_Lv9 Mast_Lv0 Mast_Lv1 Mast_Lv2 Mast_Lv3</span></span>
-<span><span class="co">## ABCC11             54             23       42        9        0        3</span></span>
-<span><span class="co">## ACTA2             135            138      396       37       35       22</span></span>
-<span><span class="co">## ACTG2             292            320      416       29       23       13</span></span>
-<span><span class="co">## ADAM9             372            294      167       12       13       11</span></span>
-<span><span class="co">## ADGRE5             57             52      147       15        6        5</span></span>
+<span><span class="co">## ABCC11              7              2        8        2        2        0</span></span>
+<span><span class="co">## ACTA2              49             24       61       11       17        1</span></span>
+<span><span class="co">## ACTG2             104             22       60        4       15        2</span></span>
+<span><span class="co">## ADAM9              63             20       29        4        9        1</span></span>
+<span><span class="co">## ADGRE5             15              4       29        1        5        2</span></span>
 <span><span class="co">##        Mast_Lv4 Mast_Lv5 Mast_Lv6 Mast_Lv7 Mast_Lv8 Mast_Lv9 Pericyte_Lv0</span></span>
-<span><span class="co">## ABCC11        2        2        1        4        5        2          127</span></span>
-<span><span class="co">## ACTA2        14       14        4        8       13        8        18071</span></span>
-<span><span class="co">## ACTG2         3       11        8        8        3       10         5078</span></span>
-<span><span class="co">## ADAM9         5        5        5        6        4       12         1475</span></span>
-<span><span class="co">## ADGRE5        4        1        2        5        0        5         1236</span></span>
+<span><span class="co">## ABCC11        0        0        0        2        5        0           13</span></span>
+<span><span class="co">## ACTA2         0        1        4        1       12        6         1917</span></span>
+<span><span class="co">## ACTG2         0        1        1        7        3        2          600</span></span>
+<span><span class="co">## ADAM9         0        0        2        0        4        1          145</span></span>
+<span><span class="co">## ADGRE5        1        0        0        0        0        2          127</span></span>
 <span><span class="co">##        Pericyte_Lv1 Pericyte_Lv2 Pericyte_Lv3 Pericyte_Lv4 Pericyte_Lv5</span></span>
-<span><span class="co">## ABCC11           55           22           25           13           19</span></span>
-<span><span class="co">## ACTA2          2734         1287         1409          627          684</span></span>
-<span><span class="co">## ACTG2           604          325          391          113          114</span></span>
-<span><span class="co">## ADAM9           281          175          163           76           71</span></span>
-<span><span class="co">## ADGRE5          179           74           94           33           36</span></span>
+<span><span class="co">## ABCC11            7            3            2            2            4</span></span>
+<span><span class="co">## ACTA2           517          316          260          127          127</span></span>
+<span><span class="co">## ACTG2           125           72           57           43           20</span></span>
+<span><span class="co">## ADAM9            57           39           24            9           10</span></span>
+<span><span class="co">## ADGRE5           50           19           14            9            4</span></span>
 <span><span class="co">##        Pericyte_Lv6 Pericyte_Lv7 Pericyte_Lv8 Pericyte_Lv9 T_NK_Lv0 T_NK_Lv1</span></span>
-<span><span class="co">## ABCC11           33           22            8            8      532      186</span></span>
-<span><span class="co">## ACTA2           676          615          257          183     7348     1275</span></span>
-<span><span class="co">## ACTG2           158          128           47           56    10370     1152</span></span>
-<span><span class="co">## ADAM9           113          118           30           32     2001      325</span></span>
-<span><span class="co">## ADGRE5           42           41           22           12     7213      921</span></span>
+<span><span class="co">## ABCC11            6            6            1            4       44       14</span></span>
+<span><span class="co">## ACTA2            83          124          112           61      722      129</span></span>
+<span><span class="co">## ACTG2            19           23           19           15     1156      140</span></span>
+<span><span class="co">## ADAM9            14           14           10            7      198       33</span></span>
+<span><span class="co">## ADGRE5            9            8            1            5      789      121</span></span>
 <span><span class="co">##        T_NK_Lv2 T_NK_Lv3 T_NK_Lv4 T_NK_Lv5 T_NK_Lv6 T_NK_Lv7 T_NK_Lv8 T_NK_Lv9</span></span>
-<span><span class="co">## ABCC11      119      103       63       77       53       79       40       19</span></span>
-<span><span class="co">## ACTA2       576      469      218      211      247      250      115       45</span></span>
-<span><span class="co">## ACTG2       568      482      227      257      193      200      120       55</span></span>
-<span><span class="co">## ADAM9       229      201      117       79      101      121       79       28</span></span>
-<span><span class="co">## ADGRE5      415      321      155      127      121      145       79       25</span></span>
+<span><span class="co">## ABCC11       20       19       18       14       16        7        7        0</span></span>
+<span><span class="co">## ACTA2       118       74       97       77       45       28       52       13</span></span>
+<span><span class="co">## ACTG2        93       70       73       87       39       19       28        5</span></span>
+<span><span class="co">## ADAM9        42       25       21       33       26       12       18        4</span></span>
+<span><span class="co">## ADGRE5       81       46       62       47       26       26       28        3</span></span>
 <span><span class="co">## 308 more rows ...</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $samples</span></span>
 <span><span class="co">##       group lib.size norm.factors n.cells cell_type contour.level</span></span>
-<span><span class="co">## B_Lv0     1   301585            1    3079         B             0</span></span>
-<span><span class="co">## B_Lv1     1    23837            1     219         B             1</span></span>
-<span><span class="co">## B_Lv2     1    10704            1      89         B             2</span></span>
-<span><span class="co">## B_Lv3     1     5856            1      51         B             3</span></span>
-<span><span class="co">## B_Lv4     1     3072            1      25         B             4</span></span>
+<span><span class="co">## B_Lv0     1    33360            1     355         B             0</span></span>
+<span><span class="co">## B_Lv1     1     5047            1      47         B             1</span></span>
+<span><span class="co">## B_Lv2     1     3244            1      27         B             2</span></span>
+<span><span class="co">## B_Lv3     1     1431            1      13         B             3</span></span>
+<span><span class="co">## B_Lv4     1     1417            1      11         B             4</span></span>
 <span><span class="co">## 95 more rows ...</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## $genes</span></span>
@@ -998,7 +1038,7 @@ cell types.</p>
 <span><span class="co">## ADAM9   ADAM9</span></span>
 <span><span class="co">## ADGRE5 ADGRE5</span></span>
 <span><span class="co">## 308 more rows ...</span></span></code></pre>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 313 100</span></span></code></pre>
 <p>Now that the object become a DGEList object, we can then use package
@@ -1006,7 +1046,7 @@ such as <code>edgeR</code> to examine the data.</p>
 <p>We can see that in PCA space, the pseudobulk data are clustered by
 cell type, and within cell type, we can observe a trend of variance by
 contour level.</p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu">edgeR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/calcNormFactors.html" class="external-link">calcNormFactors</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
 <span><span class="va">pca.res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu">edgeR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/edgeR/man/cpm.html" class="external-link">cpm</a></span><span class="op">(</span><span class="va">y</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>, rank. <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">$</span><span class="va">x</span></span>
 <span></span>
@@ -1016,7 +1056,7 @@ contour level.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">ws_colors</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggrepel</span><span class="fu">::</span><span class="fu"><a href="https://ggrepel.slowkow.com/reference/geom_text_repel.html" class="external-link">geom_text_repel</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">contour.level</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_classic</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-53-1.png" class="r-plt" width="1800"></p>
+<p><img src="hoodscanR_scider_workshop_files/figure-html/unnamed-chunk-54-1.png" class="r-plt" width="1800"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1036,9 +1076,9 @@ coordinates to the <code>reducedDims</code> slot of the object.</p>
 SpatialExperiment object, which can then read by
 <code>scanpy.read_h5ad</code> via the <code>scanpy</code> library in
 Python.</p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1.RDS"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">spe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"../inst/extdata/spe_S1_Rep1.RDS"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html" class="external-link">reducedDims</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spatial <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SpatialExperiment/man/SpatialExperiment-methods.html" class="external-link">spatialCoords</a></span><span class="op">(</span><span class="va">spe</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">zellkonverter</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/zellkonverter/man/writeH5AD.html" class="external-link">writeH5AD</a></span><span class="op">(</span><span class="va">spe</span>, file <span class="op">=</span> <span class="st">"../inst/extdata/spe.h5ad"</span>, compression <span class="op">=</span> <span class="st">"gzip"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1055,11 +1095,11 @@ in different perspectives, therefore offering .</p>
 </h2>
 <p>This workflow depends on various packages from version 3.23 of the
 Bioconductor project, running on R Under development (unstable)
-(2025-11-22 r89050) or higher. The complete list of the packages used
+(2025-12-07 r89119) or higher. The complete list of the packages used
 for this workflow are shown below:</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R Under development (unstable) (2025-11-22 r89050)</span></span>
+<pre><code><span><span class="co">## R Under development (unstable) (2025-12-07 r89119)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
 <span><span class="co">## Running under: Ubuntu 24.04.3 LTS</span></span>
 <span><span class="co">## </span></span>
@@ -1083,11 +1123,11 @@ for this workflow are shown below:</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] sf_1.0-22                   future_1.68.0              </span></span>
+<span><span class="co">##  [1] sf_1.0-23                   future_1.68.0              </span></span>
 <span><span class="co">##  [3] Seurat_5.3.1                SeuratObject_5.2.0         </span></span>
 <span><span class="co">##  [5] sp_2.2-0                    SpatialExperiment_1.21.0   </span></span>
 <span><span class="co">##  [7] SingleCellExperiment_1.33.0 SummarizedExperiment_1.41.0</span></span>
-<span><span class="co">##  [9] Biobase_2.71.0              GenomicRanges_1.63.0       </span></span>
+<span><span class="co">##  [9] Biobase_2.71.0              GenomicRanges_1.63.1       </span></span>
 <span><span class="co">## [11] Seqinfo_1.1.0               IRanges_2.45.0             </span></span>
 <span><span class="co">## [13] S4Vectors_0.49.0            BiocGenerics_0.57.0        </span></span>
 <span><span class="co">## [15] generics_0.1.4              MatrixGenerics_1.23.0      </span></span>
@@ -1102,28 +1142,28 @@ for this workflow are shown below:</p>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##   [1] RcppAnnoy_0.0.22       splines_4.6.0          later_1.4.4           </span></span>
 <span><span class="co">##   [4] filelock_1.0.3         polyclip_1.10-7        janitor_2.2.1         </span></span>
-<span><span class="co">##   [7] fastDummies_1.7.5      lifecycle_1.0.4        edgeR_4.9.0           </span></span>
+<span><span class="co">##   [7] fastDummies_1.7.5      lifecycle_1.0.4        edgeR_4.9.1           </span></span>
 <span><span class="co">##  [10] doParallel_1.0.17      globals_0.18.0         lattice_0.22-7        </span></span>
 <span><span class="co">##  [13] MASS_7.3-65            magrittr_2.0.4         limma_3.67.0          </span></span>
 <span><span class="co">##  [16] plotly_4.11.0          sass_0.4.10            rmarkdown_2.30        </span></span>
-<span><span class="co">##  [19] jquerylib_0.1.4        yaml_2.3.10            httpuv_1.6.16         </span></span>
+<span><span class="co">##  [19] jquerylib_0.1.4        yaml_2.3.12            httpuv_1.6.16         </span></span>
 <span><span class="co">##  [22] otel_0.2.0             sctransform_0.4.2      spam_2.11-1           </span></span>
 <span><span class="co">##  [25] spatstat.sparse_3.1-0  reticulate_1.44.1      DBI_1.2.3             </span></span>
 <span><span class="co">##  [28] cowplot_1.2.0          pbapply_1.7-4          RColorBrewer_1.1-3    </span></span>
 <span><span class="co">##  [31] abind_1.4-8            Rtsne_0.17             SpatialPack_0.4-1     </span></span>
-<span><span class="co">##  [34] circlize_0.4.16        ggrepel_0.9.6          irlba_2.3.5.1         </span></span>
+<span><span class="co">##  [34] circlize_0.4.17        ggrepel_0.9.6          irlba_2.3.5.1         </span></span>
 <span><span class="co">##  [37] listenv_0.10.0         spatstat.utils_3.2-0   pheatmap_1.0.13       </span></span>
 <span><span class="co">##  [40] BiocStyle_2.39.0       units_1.0-0            goftest_1.2-3         </span></span>
 <span><span class="co">##  [43] RSpectra_0.16-2        spatstat.random_3.4-3  fitdistrplus_1.2-4    </span></span>
 <span><span class="co">##  [46] parallelly_1.45.1      pkgdown_2.2.0          codetools_0.2-20      </span></span>
 <span><span class="co">##  [49] DelayedArray_0.37.0    prettydoc_0.4.1        tidyselect_1.2.1      </span></span>
 <span><span class="co">##  [52] shape_1.4.6.1          farver_2.1.2           spatstat.explore_3.6-0</span></span>
-<span><span class="co">##  [55] jsonlite_2.0.0         GetoptLong_1.0.5       e1071_1.7-16          </span></span>
+<span><span class="co">##  [55] jsonlite_2.0.0         GetoptLong_1.1.0       e1071_1.7-16          </span></span>
 <span><span class="co">##  [58] progressr_0.18.0       ggridges_0.5.7         survival_3.8-3        </span></span>
 <span><span class="co">##  [61] iterators_1.0.14       hexDensity_1.4.10      systemfonts_1.3.1     </span></span>
 <span><span class="co">##  [64] foreach_1.5.2          dbscan_1.2.3           tools_4.6.0           </span></span>
-<span><span class="co">##  [67] ragg_1.5.0             ica_1.0-3              Rcpp_1.1.0            </span></span>
-<span><span class="co">##  [70] glue_1.8.0             gridExtra_2.3          SparseArray_1.11.5    </span></span>
+<span><span class="co">##  [67] ragg_1.5.0             ica_1.0-3              Rcpp_1.1.0.8.1        </span></span>
+<span><span class="co">##  [70] glue_1.8.0             gridExtra_2.3          SparseArray_1.11.8    </span></span>
 <span><span class="co">##  [73] mgcv_1.9-4             xfun_0.54              withr_3.0.2           </span></span>
 <span><span class="co">##  [76] BiocManager_1.30.27    fastmap_1.2.0          basilisk_1.23.0       </span></span>
 <span><span class="co">##  [79] digest_0.6.39          timechange_0.3.0       R6_2.6.1              </span></span>
@@ -1134,24 +1174,24 @@ for this workflow are shown below:</p>
 <span><span class="co">##  [94] uwot_0.2.4             pkgconfig_2.0.3        scico_1.5.0           </span></span>
 <span><span class="co">##  [97] gtable_0.3.6           ComplexHeatmap_2.27.0  lmtest_0.9-40         </span></span>
 <span><span class="co">## [100] S7_0.2.1               XVector_0.51.0         fastmatrix_0.6-4      </span></span>
-<span><span class="co">## [103] htmltools_0.5.8.1      dotCall64_1.2          clue_0.3-66           </span></span>
+<span><span class="co">## [103] htmltools_0.5.9        dotCall64_1.2          clue_0.3-66           </span></span>
 <span><span class="co">## [106] scales_1.4.0           png_0.1-8              snakecase_0.11.1      </span></span>
 <span><span class="co">## [109] spatstat.univar_3.1-5  knitr_1.50             tzdb_0.5.0            </span></span>
 <span><span class="co">## [112] reshape2_1.4.5         rjson_0.2.23           nlme_3.1-168          </span></span>
 <span><span class="co">## [115] proxy_0.4-27           cachem_1.1.0           zoo_1.8-14            </span></span>
-<span><span class="co">## [118] GlobalOptions_0.1.2    KernSmooth_2.23-26     parallel_4.6.0        </span></span>
+<span><span class="co">## [118] GlobalOptions_0.1.3    KernSmooth_2.23-26     parallel_4.6.0        </span></span>
 <span><span class="co">## [121] miniUI_0.1.2           zellkonverter_1.21.0   desc_1.4.3            </span></span>
 <span><span class="co">## [124] pillar_1.11.1          grid_4.6.0             vctrs_0.6.5           </span></span>
 <span><span class="co">## [127] RANN_2.6.2             promises_1.5.0         xtable_1.8-4          </span></span>
 <span><span class="co">## [130] cluster_2.1.8.1        evaluate_1.0.5         magick_2.9.0          </span></span>
 <span><span class="co">## [133] locfit_1.5-9.12        cli_3.6.5              compiler_4.6.0        </span></span>
-<span><span class="co">## [136] rlang_1.1.6            crayon_1.5.3           future.apply_1.20.0   </span></span>
+<span><span class="co">## [136] rlang_1.1.6            crayon_1.5.3           future.apply_1.20.1   </span></span>
 <span><span class="co">## [139] labeling_0.4.3         classInt_0.4-11        plyr_1.8.9            </span></span>
 <span><span class="co">## [142] fs_1.6.6               stringi_1.8.7          viridisLite_0.4.2     </span></span>
 <span><span class="co">## [145] deldir_2.0-4           lazyeval_0.2.2         spatstat.geom_3.6-1   </span></span>
 <span><span class="co">## [148] Matrix_1.7-4           dir.expiry_1.19.0      RcppHNSW_0.6.0        </span></span>
 <span><span class="co">## [151] hms_1.1.4              patchwork_1.3.2        statmod_1.5.1         </span></span>
-<span><span class="co">## [154] shiny_1.11.1           ROCR_1.0-11            igraph_2.2.1          </span></span>
+<span><span class="co">## [154] shiny_1.12.1           ROCR_1.0-11            igraph_2.2.1          </span></span>
 <span><span class="co">## [157] bslib_0.9.0            lwgeom_0.2-14</span></span></code></pre>
 </div>
   </div>
